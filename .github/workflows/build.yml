@@ -1,0 +1,94 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies (Windows)
+        run: |
+          npm install
+          cargo install tauri-cli --version "^2"
+
+      - name: Build Tauri app
+        run: npx tauri build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Get version from tauri.conf.json
+        id: version
+        shell: pwsh
+        run: |
+          $conf = Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json
+          echo "version=$($conf.version)" >> $env:GITHUB_OUTPUT
+
+      - name: Get NSIS path
+        id: nsis
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Path src-tauri/target/release/bundle/nsis -Filter "*_x64-setup.exe" | Select-Object -First 1
+          if (-not $exe) {
+            $exe = Get-ChildItem -Path src-tauri/target/release/bundle/nsis -Filter "*_x64-setup.exe" -Recurse | Select-Object -First 1
+          }
+          if (-not $exe) {
+            Write-Host "Available files:"
+            Get-ChildItem -Path src-tauri/target/release/bundle -Recurse -File | Select-Object FullName
+            exit 1
+          }
+          echo "path=$($exe.FullName)" >> $env:GITHUB_OUTPUT
+          echo "name=$($exe.Name)" >> $env:GITHUB_OUTPUT
+
+      - name: Generate latest.json
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $exeName = "${{ steps.nsis.outputs.name }}"
+          $signature = ""
+          
+          $sigFile = "${{ steps.nsis.outputs.path }}.sig"
+          if (Test-Path $sigFile) {
+            $signature = Get-Content $sigFile -Raw
+            $signature = $signature.Trim()
+          }
+          
+          $latest = @{
+            version = $version
+            notes = "Version $version"
+            pub_date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+            platforms = @{
+              "windows-x86_64" = @{
+                signature = $signature
+                url = "https://github.com/${{ github.repository }}/releases/download/v$version/$exeName"
+              }
+            }
+          }
+          
+          $latest | ConvertTo-Json -Depth 5 | Set-Content -Path "latest.json"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ steps.nsis.outputs.path }}
+            latest.json
+          generate_release_notes: true

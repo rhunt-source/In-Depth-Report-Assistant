@@ -1,0 +1,11 @@
+{
+  "version": "1.3.0",
+  "notes": "Tauri-native auto-updater with GitHub Releases",
+  "pub_date": "2026-07-10T00:00:00Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "",
+      "url": "https://github.com/rhunt-source/in-depth-report-assistant/releases/download/v1.3.0/In-Depth-Report-Assistant_1.3.0_x64-setup.exe"
+    }
+  }
+}
