@@ -1184,9 +1184,9 @@
 
 <script>
 // ── App Info ──────────────────────────────────────────────────
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.3.1';
 const CHANGELOG = [
-    'Customizable table columns with drag-and-drop reorder',
+    'Fixed column drag-and-drop reordering in Customize Columns',
     'Locked Notes and Actions columns',
     'Enhanced dashboard with program distribution donut chart',
     'Average days active tracker (referral to end date)',
@@ -1810,13 +1810,17 @@ function toggleColumnPanel() {
 
 function renderColumnList() {
     const list = document.getElementById('columnList');
-    const allOrdered = COLUMN_DEFS.filter(c => !LOCKED_COLUMNS.includes(c.id)).map(c => c.id);
+    const nonLocked = COLUMN_DEFS.filter(c => !LOCKED_COLUMNS.includes(c.id));
+    const nonLockedIds = nonLocked.map(c => c.id);
+    const visible = tableColumns.filter(id => nonLockedIds.includes(id));
+    const hidden = nonLockedIds.filter(id => !tableColumns.includes(id));
+    const allOrdered = [...visible, ...hidden];
     list.innerHTML = allOrdered.map(id => {
         const col = getColDef(id);
-        const visible = tableColumns.includes(id);
-        return `<div class="col-drag-item" draggable="${visible}" data-col-id="${id}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--row-stripe);border-radius:8px;font-size:13px;${visible?'':'opacity:0.5;'}${visible?'cursor:grab;':'cursor:default;'}">
-            <input type="checkbox" ${visible?'checked':''} onchange="toggleColumnVisibility('${id}', this.checked)" style="cursor:pointer;">
-            <span style="flex:1;color:var(--text);user-select:none;">${visible?'⠿ ':''}${col.label}</span>
+        const isVisible = tableColumns.includes(id);
+        return `<div class="col-drag-item" draggable="${isVisible}" data-col-id="${id}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--row-stripe);border-radius:8px;font-size:13px;${isVisible?'':'opacity:0.5;'}${isVisible?'cursor:grab;':'cursor:default;'}">
+            <input type="checkbox" ${isVisible?'checked':''} onchange="toggleColumnVisibility('${id}', this.checked)" style="cursor:pointer;">
+            <span style="flex:1;color:var(--text);user-select:none;">${isVisible?'⠿ ':''}${col.label}</span>
         </div>`;
     }).join('');
     list.querySelectorAll('.col-drag-item[draggable="true"]').forEach(el => {
