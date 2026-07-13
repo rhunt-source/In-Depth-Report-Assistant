@@ -35,7 +35,7 @@
   "plugins": {
     "updater": {
       "endpoints": [
-        "https://github.com/rhunt-source/in-depth-report-assistant/releases/latest/download/latest.json"
+        "https://github.com/rhunt-source/In-Depth-Report-Assistant/releases/latest/download/latest.json"
       ],
       "pubkey": ""
     }
