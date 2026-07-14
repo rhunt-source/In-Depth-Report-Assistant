@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Hammersmith+One&display=swap" rel="stylesheet">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>In Depth Report Assistant</title>
+    <title>In-Depth</title>
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <script src="app.js"></script>
     <style>
@@ -270,6 +271,8 @@
         tr.stale-row { box-shadow: inset 3px 0 0 var(--amber); }
         .stale-flag { display: inline-flex; align-items: center; margin-left: 6px; font-size: 12px; cursor: help; }
 
+        .tutorial-highlight { position: relative; outline: 3px solid #1c7289; outline-offset: 2px; border-radius: 8px; box-shadow: 0 0 0 6px rgba(28,114,137,0.15); z-index: 1; }
+
         .variance-banner { display: none; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--badge-red-bg); color: var(--badge-red-text); border: 1px solid var(--danger-text); border-radius: 10px; padding: 10px 16px; margin-bottom: 12px; font-size: 13px; }
         .variance-banner.visible { display: flex; }
         .variance-banner-text { display: flex; align-items: center; gap: 8px; }
@@ -371,7 +374,7 @@
 </head>
 <body>
 <div class="app">
-    <aside class="sidebar">
+    <aside class="sidebar" data-tutorial-section="sidebar">
         <div class="sidebar-logo">
             <div class="logo-wrap" id="logoWrap">
                 <img src="./indepthlogo.png" alt="Logo" style="width: 150px; height: auto; display: block; margin: 0 auto;" />
@@ -404,7 +407,13 @@
                 Help
             </button>
         </nav>
-        <div class="sidebar-footer"></div>
+        <div class="sidebar-footer">
+            <div style="text-align:center;font-family:'Hammersmith One',sans-serif;font-size:8px;color:rgba(255,255,255,0.85);letter-spacing:0.5px;">
+                <div>insight navigation</div>
+                <div style="margin-top:2px;">data entry &</div>
+                <div>participant tracking hub</div>
+            </div>
+        </div>
     </aside>
 
     <main class="main">
@@ -416,6 +425,7 @@
             </div>
             <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
                 <button id="toggleMonth" class="btn-primary" onclick="setDashPeriod('month')">Active Now</button>
+                <button id="toggleThisMonth" class="btn-secondary" onclick="setDashPeriod('thisMonth')">This Month</button>
                 <button id="toggleYear" class="btn-secondary" onclick="setDashPeriod('year')">This Year</button>
                 <button id="toggleCustom" class="btn-secondary" onclick="setDashPeriod('custom')">Custom Range</button>
             </div>
@@ -444,11 +454,14 @@
             <div class="card">
                 <h3 id="formTitle">New Entry</h3>
                 <div class="form-section-title">Participant</div>
-                <div class="form-grid">
-                    <div class="form-group"><label>Participant Name</label><input type="text" id="participantName" placeholder="Enter participant name"></div>
-                    <div class="form-group"><label>Date of Birth</label><input type="date" id="dob"></div>
-                    <div class="form-group"><label>Racial Identity</label><select id="race"><option value=""></option><option>White</option><option>Black</option><option>Indigenous</option><option>South Asian</option><option>East or Southeast Asian</option><option>Middle Eastern or North African</option><option>Latin American</option><option>Other</option><option>Prefer not to say</option></select></div>
-                    <div class="form-group"><label>Disability Disclosure</label><select id="disabilityDisclosure"><option value=""></option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
+                <div style="display:flex;gap:14px;margin-bottom:8px;">
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Participant Name</label><input type="text" id="participantName" placeholder="Enter participant name"></div>
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Date of Birth</label><input type="date" id="dob"></div>
+                </div>
+                <div style="display:flex;gap:14px;margin-bottom:16px;">
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Gender</label><select id="gender"><option value=""></option><option>Male</option><option>Female</option><option>Non-Binary</option><option>Not Specified</option><option>Other</option></select></div>
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Racial Identity</label><select id="race"><option value=""></option><option>White</option><option>Black</option><option>Indigenous</option><option>South Asian</option><option>East or Southeast Asian</option><option>Middle Eastern or North African</option><option>Latin American</option><option>Other</option><option>Prefer not to say</option></select></div>
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Disability Disclosure</label><select id="disabilityDisclosure"><option value=""></option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
                 </div>
                 <div class="form-section-title">Referral</div>
                 <div class="form-grid">
@@ -523,7 +536,7 @@
         </div>
 
         <!-- ARCHIVE PAGE -->
-        <div id="page-archive" class="page">
+        <div id="page-archive" class="page" data-tutorial-section="archive">
             <div class="page-header"><h1>Archive</h1><p>Monthly report snapshots — one per report month</p></div>
             <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
                 <button class="btn-primary" onclick="archiveCurrentMonth()">📥 Archive Current Month</button>
@@ -688,7 +701,7 @@
         </div>
 
         <!-- SETTINGS PAGE -->
-        <div id="page-settings" class="page">
+        <div id="page-settings" class="page" data-tutorial-section="settings">
             <div class="page-header">
                 <h1>Settings</h1>
                 <p>Customize how the app looks and displays information</p>
@@ -700,7 +713,7 @@
                         <div class="settings-row-left" style="width:100%;">
                             <div class="settings-icon">📚</div>
                             <div>
-                                <div class="settings-row-title">In Depth Report Assistant</div>
+                                <div class="settings-row-title">In-Depth</div>
                                 <div class="settings-row-desc">Version <span id="aboutVersion">—</span></div>
                             </div>
                         </div>
@@ -813,14 +826,14 @@
         </div>
 
         <!-- HELP PAGE -->
-        <div id="page-help" class="page">
+        <div id="page-help" class="page" data-tutorial-section="help">
             <div class="page-header">
                 <h1>Help</h1>
                 <p>Support and contact information</p>
             </div>
             <div class="help-card">
                 <p>Your feedback is welcome! If you have questions or suggestions, please reach out via email.</p>
-                <a href="mailto:rhunt@jhsnl.ca?subject=In Depth Report Assistant Query" class="email-btn">
+                <a href="mailto:rhunt@jhsnl.ca?subject=In-Depth Query" class="email-btn">
                     <span class="email-icon">✉️</span>
                     <span>
                         <span style="display:block;font-size:13px;font-weight:700;">Send an Email</span>
@@ -829,10 +842,31 @@
                 </a>
             </div>
 
+            <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
+                <div style="flex:1 1 200px;">
+                    <div class="page-header">
+                        <h1 style="font-size:20px;">Sandbox</h1>
+                    </div>
+                    <div class="help-card" data-tutorial-section="help-sandbox">
+                        <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">A safe place to practice adding, editing, and filtering entries without touching your real data.</p>
+                        <button class="btn-primary" style="background:#1c7289;" onclick="showPage('practice', event)">Practice</button>
+                    </div>
+                </div>
+                <div style="flex:1 1 200px;">
+                    <div class="page-header">
+                        <h1 style="font-size:20px;">Tutorial</h1>
+                    </div>
+                    <div class="help-card" data-tutorial-section="help-tutorial">
+                        <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">A guided walkthrough of every feature in the app — from adding entries to using the dashboard.</p>
+                        <button class="btn-primary" style="background:#1c7289;" onclick="showPage('practice', null); setTimeout(() => p_startTutorial(), 200);">📖 Start Tutorial</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="page-header" style="margin-top:8px;">
                 <h1 style="font-size:20px;">Frequently Asked Questions</h1>
             </div>
-            <div class="faq-list">
+            <div class="faq-list" data-tutorial-section="help-faq">
                 <div class="faq-section">
                     <div class="faq-section-header" onclick="toggleAccordion(this)">
                         <div class="faq-section-header-left">
@@ -1041,6 +1075,129 @@
                 </div>
             </div>
         </div>
+
+        <!-- PRACTICE PAGE (isolated sandbox) -->
+        <div id="page-practice" class="page">
+            <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+                <div id="p_headerTitle"><h1>Entries</h1><p>A safe place to practice adding, editing, and filtering entries without touching your real data.</p></div>
+                <div style="background:#F26B3D15;border:1px solid #F26B3D40;border-radius:8px;padding:6px 12px;font-size:12px;color:#F26B3D;font-weight:600;">Practice Mode — Your real data is safe</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <button class="btn-secondary" id="p_toggleTableViewBtn" onclick="p_toggleView('table')" style="background:#32B9A3;color:#fff;">📋 Table</button>
+                    <button class="btn-secondary" id="p_toggleDashViewBtn" onclick="p_toggleView('dashboard')">📊 Dashboard</button>
+                    <button class="btn-secondary" onclick="showPage('help', event)">← Back to Help</button>
+                </div>
+            </div>
+            <div id="p_viewTable">
+            <div class="card">
+                <h3 id="p_formTitle">New Entry (Practice)</h3>
+                <div class="form-section-title" data-tutorial-section="participant">Participant</div>
+                <div style="display:flex;gap:14px;margin-bottom:8px;" data-tutorial-section="participant">
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Participant Name</label><input type="text" id="p_participantName" placeholder="Enter participant name"></div>
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Date of Birth</label><input type="date" id="p_dob"></div>
+                </div>
+                <div style="display:flex;gap:14px;margin-bottom:16px;" data-tutorial-section="participant">
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Gender</label><select id="p_gender"><option value=""></option><option>Male</option><option>Female</option><option>Non-Binary</option><option>Not Specified</option><option>Other</option></select></div>
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Racial Identity</label><select id="p_race"><option value=""></option><option>White</option><option>Black</option><option>Indigenous</option><option>South Asian</option><option>East or Southeast Asian</option><option>Middle Eastern or North African</option><option>Latin American</option><option>Other</option><option>Prefer not to say</option></select></div>
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Disability Disclosure</label><select id="p_disabilityDisclosure"><option value=""></option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
+                </div>
+                <div class="form-section-title" data-tutorial-section="referral">Referral</div>
+                <div class="form-grid" data-tutorial-section="referral">
+                    <div class="form-group"><label>Referral Source</label><input type="text" id="p_referralSource" placeholder="Enter referral source"></div>
+                    <div class="form-group"><label>Referral Source Agency</label>
+                        <select id="p_referralAgency"><option value=""></option><option>APO</option><option>Community Organization</option><option>HMP</option><option>Horizons Academy</option><option>NLYC</option><option>Self</option><option>SSWB</option><option>Other</option></select>
+                    </div>
+                    <div class="form-group"><label>Program</label>
+                        <select id="p_program" onchange="p_toggleConditionalFields()"><option value=""></option><option>Anger Solutions</option><option>CBA</option><option>Clinical Counselling</option><option>Dads</option><option>DBT</option><option>IDA</option><option>Maintenance</option><option>PAR</option><option>Safety and Repair</option><option>Safety and Repair (IPVIC)</option><option>Seeking Safety</option><option>STABLE</option></select>
+                    </div>
+                </div>
+                <div id="p_conditionalRow" class="form-grid hidden-row">
+                    <div class="form-group"><label>Region</label><select id="p_region"><option value=""></option><option>St. John's</option><option>Central</option></select></div>
+                    <div class="form-group"><label>Risk Level</label><select id="p_riskLevel"><option>N/A</option><option>Low</option><option>Medium</option><option>High</option><option>Very High</option></select></div>
+                </div>
+                <div class="form-section-title" data-tutorial-section="timeline">Timeline</div>
+                <div class="date-row" data-tutorial-section="timeline">
+                    <div class="form-group"><label>Referral Date</label><input type="date" id="p_referralDate" onchange="p_handleDateChange('referralDate')"></div><div class="date-arrow">→</div>
+                    <div class="form-group"><label>Assessment Date</label><input type="date" id="p_assessmentDate" onchange="p_handleDateChange('assessmentDate')" disabled></div><div class="date-arrow">→</div>
+                    <div class="form-group"><label>Start Date</label><input type="date" id="p_startDate" onchange="p_handleDateChange('startDate')" disabled></div><div class="date-arrow">→</div>
+                    <div class="form-group"><label>End Date</label><input type="date" id="p_endDate" onchange="p_handleDateChange('endDate')" disabled></div>
+                </div>
+                <div class="progress-container"><div id="p_progressBar" class="progress-fill"></div></div>
+                <div class="form-section-title" data-tutorial-section="status">Status & Delivery</div>
+                <div class="form-grid" data-tutorial-section="status">
+                    <div class="form-group"><label>Status</label><select id="p_status" onchange="p_toggleConditionalFields()"><option value=""></option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Disengaged</option><option>Complete</option></select></div>
+                    <div class="form-group"><label>Location</label><select id="p_location"><option value=""></option><option>Community</option><option>HMP</option><option>Virtual</option><option>Other</option></select></div>
+                    <div class="form-group" id="p_daysActiveGroup" style="display:none;"><label>Days Active</label><input type="text" id="p_daysActive" readonly placeholder="—"></div>
+                    <div class="form-group" id="p_deliveryTypeGroup"><label>Delivery Type</label><select id="p_deliveryType"><option value=""></option><option>Individual</option><option>Group</option></select></div>
+                    <div class="form-group" id="p_reportCompletedGroup" style="display:none;"><label>Report Completed</label><select id="p_reportCompleted"><option>N/A</option><option>Yes</option><option>No</option></select></div>
+                </div>
+                <div class="form-section-title" data-tutorial-section="notes">Notes <span class="form-section-optional">(Optional)</span></div>
+                <div class="form-grid" data-tutorial-section="notes">
+                    <div class="form-group" style="grid-column:1/-1;"><label>Add a Note</label><textarea id="p_entryNote" placeholder="Add an optional note for this entry..." rows="2"></textarea></div>
+                </div>
+                <div class="btn-row" style="justify-content:space-between;flex-wrap:wrap;" data-tutorial-section="actions">
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <button class="btn-primary" id="p_addBtn" onclick="p_saveEntry()" style="background:#1c7289;">➕ Add Entry</button>
+                        <button class="btn-secondary" onclick="p_clearForm()" style="background:#32B9A3;color:#fff;">✕ Clear</button>
+                        <button class="btn-dark" onclick="p_unavailable()" style="background:#018170;">🗑 Wipe All Data</button>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <button class="btn-primary" onclick="p_unavailable()" style="background:#1c7289;">💾 Submit</button>
+                        <button class="btn-primary" onclick="p_unavailable()" style="background:#32B9A3;">📤 Email Report</button>
+                        <button class="btn-secondary" onclick="p_unavailable()" style="background:#018170;color:#fff;">⬇ Download</button>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-row" data-tutorial-section="table">
+                <div class="form-group" style="flex:2 1 220px"><label>Search</label><input type="text" id="p_searchInput" placeholder="Search by participant..." oninput="p_renderTable()"></div>
+                <div class="form-group"><label>Filter Program</label><select id="p_programFilter" onchange="p_renderTable()"><option value="">All Programs</option><option>Anger Solutions</option><option>CBA</option><option>Clinical Counselling</option><option>Dads</option><option>DBT</option><option>IDA</option><option>Maintenance</option><option>PAR</option><option>Safety and Repair</option><option>Safety and Repair (IPVIC)</option><option>Seeking Safety</option><option>STABLE</option></select></div>
+                <div class="form-group"><label>Filter Location</label><select id="p_locationFilter" onchange="p_renderTable()"><option value="">All Locations</option><option>Community</option><option>HMP</option><option>Virtual</option><option>Other</option></select></div>
+                <div class="form-group"><label>Filter Status</label><select id="p_statusFilter" onchange="p_renderTable()"><option value="">All Statuses</option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Disengaged</option><option>Complete</option></select></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
+                <button class="btn-secondary" onclick="p_toggleColumnPanel()">⚙️ Customize Columns</button>
+            </div>
+            <div id="p_staleBanner" class="stale-banner">
+                <div class="stale-banner-text">⚠️ <span id="p_staleBannerText"></span></div>
+                <div class="stale-banner-actions">
+                    <button class="btn-secondary" id="p_staleFilterBtn" onclick="p_toggleStaleOnlyFilter()">Show only these</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table><thead id="p_tableHead"><tr></tr></thead><tbody id="p_tableBody"></tbody></table>
+                <div id="p_emptyState" class="empty" style="display:none"><p>No entries found. Add your first entry above.</p></div>
+            </div>
+            </div>
+            <div id="p_viewDashboard" style="display:none;" data-tutorial-section="dashboard">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <p id="p_dashSubtitle">Overview of your practice entries</p>
+                </div>
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+                    <button id="p_toggleMonth" class="btn-primary" onclick="p_setDashPeriod('month')" style="background:#1c7289;">Active Now</button>
+                    <button id="p_toggleThisMonth" class="btn-secondary" onclick="p_setDashPeriod('thisMonth')">This Month</button>
+                    <button id="p_toggleYear" class="btn-secondary" onclick="p_setDashPeriod('year')">This Year</button>
+                    <button id="p_toggleCustom" class="btn-secondary" onclick="p_setDashPeriod('custom')">Custom Range</button>
+                </div>
+                <div id="p_customRangeRow" style="display:none;background:white;border:1px solid #e2e8f0;border-radius:10px;padding:14px 18px;margin-bottom:16px;gap:16px;align-items:flex-end;flex-wrap:wrap;">
+                    <div class="form-group" style="flex:1 1 160px;margin:0;"><label>From</label><input type="date" id="p_customFrom" onchange="p_applyCustomRange()"></div>
+                    <div class="form-group" style="flex:1 1 160px;margin:0;"><label>To</label><input type="date" id="p_customTo" onchange="p_applyCustomRange()"></div>
+                    <button class="btn-secondary" style="flex-shrink:0;" onclick="p_clearCustomRange()">✕ Clear</button>
+                </div>
+                <div id="p_dashMessages" style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:24px;"></div>
+                <div class="stat-grid" id="p_statGrid"></div>
+                <div id="p_dashCharts" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+                    <div class="card" style="padding:20px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><div class="stat-icon blue" style="width:28px;height:28px;border-radius:7px;font-size:14px;">📊</div><h3 style="font-size:14px;color:var(--text);">Program Distribution</h3></div>
+                        <div id="p_dashDonut" style="display:flex;align-items:center;gap:24px;"></div>
+                    </div>
+                    <div class="card" style="padding:20px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><div class="stat-icon green" style="width:28px;height:28px;border-radius:7px;font-size:14px;">⏱️</div><h3 style="font-size:14px;color:var(--text);">Average Days Active</h3></div>
+                        <div id="p_dashAvgDays"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 </div>
 
@@ -1135,7 +1292,11 @@
             <button class="btn-primary" style="width:100%;" onclick="submitWelcomeName()">Continue</button>
         </div>
         <div id="welcomeModalDoneRow" style="display:none;">
-            <button class="btn-primary" style="width:100%;" onclick="document.getElementById('welcomeModal').style.display='none'">Let's Go!</button>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Would you like a quick tour of the app?</p>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-primary" style="flex:1;" onclick="startTutorialFromWelcome()">Take the Tutorial</button>
+                <button class="btn-secondary" style="flex:1;" onclick="document.getElementById('welcomeModal').style.display='none'">Skip</button>
+            </div>
         </div>
     </div>
 </div>
@@ -1278,6 +1439,12 @@ function submitWelcomeName() {
     document.getElementById('welcomeModalSubtitle').textContent = `Thanks, ${name} — your name has been saved to Settings.`;
     document.getElementById('welcomeModalFormRow').style.display = 'none';
     document.getElementById('welcomeModalDoneRow').style.display = '';
+}
+
+function startTutorialFromWelcome() {
+    document.getElementById('welcomeModal').style.display = 'none';
+    showPage('practice', null);
+    setTimeout(() => p_startTutorial(), 200);
 }
 
 // ── Default recipient emails (multi) ───────────────────────────
@@ -1460,6 +1627,7 @@ function showPage(name, event) {
     if (name === 'entries') { renderTable(); }
     if (name === 'archive') renderArchive();
     if (name === 'settings') { applySettings(); applyReportModeUI(); }
+    if (name === 'practice') { p_loadTableColumns(); p_renderTable(); p_updateDateLocks(); }
     // Admin: just show the page, lock screen handles itself
 }
 
@@ -1578,7 +1746,7 @@ function updateProgressBar() {
 }
 
 function clearForm() {
-    const fields = ['participantName','dob','race','disabilityDisclosure','referralSource','referralAgency',
+    const fields = ['participantName','dob','race','disabilityDisclosure','gender','referralSource','referralAgency',
         'program','region','riskLevel','status','location','deliveryType','reportCompleted',
         'referralDate','assessmentDate','startDate','endDate','daysActive','entryNote'];
     fields.forEach(id => {
@@ -1603,7 +1771,7 @@ function saveEntry() {
     const program = reportMode === 'newday' ? '' : document.getElementById('program').value;
     const entry = {
         staffName,
-        participantName, dob: document.getElementById('dob').value, race: document.getElementById('race').value, disabilityDisclosure: document.getElementById('disabilityDisclosure').value, referralSource: document.getElementById('referralSource').value,
+        participantName, dob: document.getElementById('dob').value, race: document.getElementById('race').value, disabilityDisclosure: document.getElementById('disabilityDisclosure').value, gender: document.getElementById('gender').value, referralSource: document.getElementById('referralSource').value,
         referralAgency: document.getElementById('referralAgency').value, program,
         region: (reportMode !== 'newday' && isIPVIC(program)) ? document.getElementById('region').value : '',
         riskLevel: (reportMode !== 'newday' && isIPVIC(program)) ? document.getElementById('riskLevel').value : 'N/A',
@@ -1632,6 +1800,7 @@ function editEntry(i) {
     document.getElementById('dob').value = e.dob || '';
     document.getElementById('race').value = e.race || '';
     document.getElementById('disabilityDisclosure').value = e.disabilityDisclosure || '';
+    document.getElementById('gender').value = e.gender || '';
     document.getElementById('referralSource').value = e.referralSource || '';
     document.getElementById('referralAgency').value = e.referralAgency || '';
     document.getElementById('program').value = e.program || '';
@@ -1733,6 +1902,7 @@ const COLUMN_DEFS = [
     { id: 'race',        label: 'Racial Identity',       cssClass: 'col-race',          getValue: (e) => e.race || '—' },
     { id: 'risk',        label: 'Risk',                  cssClass: 'col-risk',          getValue: (e) => e.riskLevel || '—' },
     { id: 'disability',  label: 'Disability Disclosure', cssClass: 'col-disability',     getValue: (e) => e.disabilityDisclosure || '—' },
+    { id: 'gender',      label: 'Gender',                cssClass: '',                  getValue: (e) => e.gender || '—' },
     { id: 'status',      label: 'Status',                cssClass: '',                  getValue: (e, i, stale) => `<span class="badge ${statusBadgeClass(e.status)}">${e.status||'—'}</span>${stale?`<span class="stale-flag" title="Ended ${e.endDate} (${staleDaysFor(e)} days ago)">⚠️</span>`:''}` },
     { id: 'delivery',    label: 'Delivery',              cssClass: 'lrp-only',          getValue: (e) => e.deliveryType || '—' },
     { id: 'program',     label: 'Program',               cssClass: 'lrp-only',          getValue: (e) => e.program || '—' },
@@ -1915,6 +2085,7 @@ let dashPeriod = 'month';
 function setDashPeriod(period) {
     dashPeriod = period;
     document.getElementById('toggleMonth').className  = period === 'month'  ? 'btn-primary' : 'btn-secondary';
+    document.getElementById('toggleThisMonth').className = period === 'thisMonth' ? 'btn-primary' : 'btn-secondary';
     document.getElementById('toggleYear').className   = period === 'year'   ? 'btn-primary' : 'btn-secondary';
     document.getElementById('toggleCustom').className = period === 'custom' ? 'btn-primary' : 'btn-secondary';
     document.getElementById('customRangeRow').style.display = period === 'custom' ? 'flex' : 'none';
@@ -1937,6 +2108,16 @@ function renderDashboard() {
         // stale (Complete/Disengaged for 30+ days) — instead of a calendar filter.
         filtered = entries.filter(e => !isStaleEntry(e));
         subtitle = 'Current active caseload';
+    } else if (dashPeriod === 'thisMonth') {
+        const thisMonth = now.getMonth();
+        const thisYear = now.getFullYear();
+        const monthStart = new Date(thisYear, thisMonth, 1).toISOString().slice(0, 10);
+        const monthEnd = new Date(thisYear, thisMonth + 1, 0).toISOString().slice(0, 10);
+        filtered = entries.filter(e => {
+            const dates = [e.referralDate, e.assessmentDate, e.startDate, e.endDate].filter(Boolean);
+            return dates.some(d => d >= monthStart && d <= monthEnd);
+        });
+        subtitle = now.toLocaleString('default', { month: 'long', year: 'numeric' }) + ' — entries with activity this month';
     } else if (dashPeriod === 'year') {
         const cutoff = new Date(now);
         cutoff.setFullYear(cutoff.getFullYear() - 1);
@@ -1954,12 +2135,29 @@ function renderDashboard() {
         }
     }
     document.getElementById('dashSubtitle').textContent = subtitle;
+    let dateStart = null, dateEnd = null;
+    if (dashPeriod === 'thisMonth') {
+        const y = now.getFullYear(), m = now.getMonth();
+        dateStart = new Date(y, m, 1).toISOString().slice(0,10);
+        dateEnd = new Date(y, m + 1, 0).toISOString().slice(0,10);
+    } else if (dashPeriod === 'year') {
+        const c = new Date(now); c.setFullYear(c.getFullYear() - 1);
+        dateStart = c.toISOString().slice(0,10); dateEnd = todayStr;
+    } else if (dashPeriod === 'custom') {
+        dateStart = document.getElementById('customFrom').value || null;
+        dateEnd = document.getElementById('customTo').value || null;
+    }
+    const inRange = d => d && dateStart && dateEnd && d >= dateStart && d <= dateEnd;
+    const countReferrals = dashPeriod === 'month' ? filtered.filter(e=>e.referralDate).length : filtered.filter(e=>inRange(e.referralDate)).length;
+    const countAssess = dashPeriod === 'month' ? filtered.filter(e=>e.assessmentDate).length : filtered.filter(e=>inRange(e.assessmentDate)).length;
+    const countStart = dashPeriod === 'month' ? filtered.filter(e=>e.startDate).length : filtered.filter(e=>inRange(e.startDate)).length;
+    const countComplete = dashPeriod === 'month' ? filtered.filter(e=>e.endDate).length : filtered.filter(e=>inRange(e.endDate)).length;
     document.getElementById('statGrid').innerHTML = `
         <div class="stat-card"><div class="stat-icon blue">👥</div><div><div class="stat-label">Total Participants</div><div class="stat-value">${filtered.length}</div></div></div>
-        <div class="stat-card"><div class="stat-icon purple">📨</div><div><div class="stat-label">Referrals Received</div><div class="stat-value">${filtered.filter(e=>e.referralDate).length}</div></div></div>
-        <div class="stat-card"><div class="stat-icon orange">📋</div><div><div class="stat-label">Assessments Completed</div><div class="stat-value">${filtered.filter(e=>e.assessmentDate).length}</div></div></div>
-        <div class="stat-card"><div class="stat-icon blue">🚀</div><div><div class="stat-label">Started Program</div><div class="stat-value">${filtered.filter(e=>e.startDate).length}</div></div></div>
-        <div class="stat-card"><div class="stat-icon green">🎓</div><div><div class="stat-label">Completed Program</div><div class="stat-value">${filtered.filter(e=>e.status==='Complete').length}</div></div></div>
+        <div class="stat-card"><div class="stat-icon purple">📨</div><div><div class="stat-label">Referrals Received</div><div class="stat-value">${countReferrals}</div></div></div>
+        <div class="stat-card"><div class="stat-icon orange">📋</div><div><div class="stat-label">Assessments Completed</div><div class="stat-value">${countAssess}</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue">🚀</div><div><div class="stat-label">Started Program</div><div class="stat-value">${countStart}</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">🎓</div><div><div class="stat-label">Completed Program</div><div class="stat-value">${countComplete}</div></div></div>
     `;
 
     // ── Message board ──
@@ -1968,7 +2166,7 @@ function renderDashboard() {
     if (staleEntries.length > 0) {
         msgs.push(`<div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="showStaleList()"><div class="stat-icon" style="background:#F26B3D;color:#fff;width:32px;height:32px;border-radius:8px;font-size:14px;">⚠️</div><div><div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Stale Entries</div><div style="font-size:20px;font-weight:800;color:var(--text);">${staleEntries.length}<span style="font-size:12px;font-weight:400;color:var(--text-faint); margin-left:4px;">click to view</span></div></div></div>`);
     }
-    const incompleteEntries = entries.filter(e => !e.participantName || !e.dob || !e.race || !e.disabilityDisclosure || !e.referralSource || !e.referralAgency || !e.program || !e.location || !e.status || !e.deliveryType || !e.referralDate);
+    const incompleteEntries = entries.filter(e => !e.participantName || !e.dob || !e.race || !e.disabilityDisclosure || !e.gender || !e.referralSource || !e.referralAgency || !e.program || !e.location || !e.status || !e.deliveryType || !e.referralDate);
     if (incompleteEntries.length > 0) {
         msgs.push(`<div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="showIncomplete()"><div class="stat-icon orange" style="width:32px;height:32px;border-radius:8px;font-size:14px;">📝</div><div><div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Incomplete Entries</div><div style="font-size:20px;font-weight:800;color:var(--text);">${incompleteEntries.length}<span style="font-size:12px;font-weight:400;color:var(--text-faint); margin-left:4px;">click to view</span></div></div></div>`);
     }
@@ -1997,7 +2195,7 @@ function renderDashboard() {
     filtered.forEach(e => { const p = e.program || 'Unknown'; progCounts[p] = (progCounts[p]||0) + 1; });
     const progEntries = Object.entries(progCounts).sort((a,b) => b[1]-a[1]);
     const donutEl = document.getElementById('dashDonut');
-    const DONUT_COLORS = ['#092E42','#F26B3D'];
+    const DONUT_COLORS = ['#092E42','#1c7289','#32B9A3','#018170','#F26B3D','#805ad5','#2b6cb0'];
     if (progEntries.length === 0) {
         donutEl.innerHTML = '<div style="color:var(--text-faint);font-size:13px;">No data</div>';
     } else {
@@ -2103,9 +2301,9 @@ function showStaleList() {
 }
 
 function showIncomplete() {
-    const incompleteEntries = entries.filter(e => !e.participantName || !e.dob || !e.race || !e.disabilityDisclosure || !e.referralSource || !e.referralAgency || !e.program || !e.location || !e.status || !e.deliveryType || !e.referralDate).sort((a, b) => (a.participantName || '').localeCompare(b.participantName || ''));
+    const incompleteEntries = entries.filter(e => !e.participantName || !e.dob || !e.race || !e.disabilityDisclosure || !e.gender || !e.referralSource || !e.referralAgency || !e.program || !e.location || !e.status || !e.deliveryType || !e.referralDate).sort((a, b) => (a.participantName || '').localeCompare(b.participantName || ''));
     const list = document.getElementById('incompleteList');
-    const fieldLabels = { participantName: 'Name', dob: 'DOB', race: 'Race', disabilityDisclosure: 'Disability', referralSource: 'Source', referralAgency: 'Agency', program: 'Program', location: 'Location', status: 'Status', deliveryType: 'Delivery', referralDate: 'Referral Date' };
+    const fieldLabels = { participantName: 'Name', dob: 'DOB', race: 'Race', disabilityDisclosure: 'Disability', gender: 'Gender', referralSource: 'Source', referralAgency: 'Agency', program: 'Program', location: 'Location', status: 'Status', deliveryType: 'Delivery', referralDate: 'Referral Date' };
     if (incompleteEntries.length === 0) {
         list.innerHTML = '<div style="color:var(--text-faint);font-size:13px;padding:8px 0;">All entries complete</div>';
     } else {
@@ -3297,6 +3495,645 @@ renderQuarterlyReport();
 renderProgramBoxSummary();
 renderUploadList();
 
+// ── Practice Sandbox (fully isolated) ──────────────────────────
+let practiceEntries = [
+    { participantName:'LeBron James', dob:'1984-12-30', race:'Black', disabilityDisclosure:'', gender:'Male', referralSource:'Phil Jackson', referralAgency:'HMP', program:'Anger Solutions', region:'', riskLevel:'N/A', status:'Complete', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-04-07', assessmentDate:'2026-04-20', startDate:'2026-05-04', endDate:'2026-07-13', notes:[] },
+    { participantName:'Luka Doncic', dob:'1999-02-28', race:'White', disabilityDisclosure:'No', gender:'Male', referralSource:'Red Auerbach', referralAgency:'APO', program:'Safety and Repair (IPVIC)', region:"St. John's", riskLevel:'High', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-06-20', assessmentDate:'2026-06-25', startDate:'2026-07-05', endDate:'', notes:[] },
+    { participantName:'Caitlin Clark', dob:'2002-01-22', race:'White', disabilityDisclosure:'No', gender:'Female', referralSource:'Red Auerbach', referralAgency:'APO', program:'Seeking Safety', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-07-12', assessmentDate:'2026-07-13', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Anthony Davis', dob:'1993-03-11', race:'Black', disabilityDisclosure:'No', gender:'Male', referralSource:'Jerry Sloan', referralAgency:'HMP', program:'Seeking Safety', region:'', riskLevel:'N/A', status:'Ongoing', location:'HMP', deliveryType:'Group', reportCompleted:'', referralDate:'2026-06-18', assessmentDate:'2026-06-25', startDate:'2026-07-05', endDate:'', notes:[] },
+    { participantName:'Paige Bueckers', dob:'2001-10-20', race:'White', disabilityDisclosure:'Yes', gender:'Female', referralSource:'Pat Riley', referralAgency:'APO', program:'Seeking Safety', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-07-12', assessmentDate:'2026-07-13', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Rui Hachimura', dob:'1998-02-08', race:'East or Southeast Asian', disabilityDisclosure:'No', gender:'Male', referralSource:'Larry Brown', referralAgency:'HMP', program:'Safety and Repair (IPVIC)', region:"St. John's", riskLevel:'Medium', status:'Ongoing', location:'Community', deliveryType:'Individual', reportCompleted:'', referralDate:'2026-06-25', assessmentDate:'2026-06-30', startDate:'2026-07-10', endDate:'', notes:[] },
+    { participantName:'James Harden', dob:'1989-08-26', race:'Black', disabilityDisclosure:'No', gender:'Male', referralSource:'Pat Riley', referralAgency:'APO', program:'Anger Solutions', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-05-20', assessmentDate:'2026-05-25', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Nikola Jokic', dob:'1995-02-19', race:'White', disabilityDisclosure:'No', gender:'Male', referralSource:'Jerry Sloan', referralAgency:'HMP', program:'Seeking Safety', region:'', riskLevel:'N/A', status:'Intake Completed - Not Accepted', location:'HMP', deliveryType:'Group', reportCompleted:'', referralDate:'2026-07-10', assessmentDate:'2026-07-12', startDate:'', endDate:'', notes:[] },
+    { participantName:'Breanna Stewart', dob:'1994-08-27', race:'White', disabilityDisclosure:'Yes', gender:'Female', referralSource:'Becky Hammond', referralAgency:'SSWB', program:'Seeking Safety', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-07-13', assessmentDate:'2026-07-13', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Juan Toscano-Anderson', dob:'1993-04-10', race:'Latin American', disabilityDisclosure:'No', gender:'Male', referralSource:'Lenny Wilkens', referralAgency:'APO', program:'Dads', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-07-10', assessmentDate:'2026-07-12', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Angel Reese', dob:'2002-05-06', race:'Black', disabilityDisclosure:'No', gender:'Female', referralSource:'Becky Hammond', referralAgency:'SSWB', program:'Anger Solutions', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-07-12', assessmentDate:'2026-07-13', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Steven Adams', dob:'1993-07-20', race:'White', disabilityDisclosure:'No', gender:'Male', referralSource:'Gregg Popovich', referralAgency:'APO', program:'Anger Solutions', region:'', riskLevel:'N/A', status:'Complete', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-03-01', assessmentDate:'2026-03-05', startDate:'2026-03-15', endDate:'2026-06-01', notes:[] },
+    { participantName:'Russell Westbrook', dob:'1988-11-12', race:'Black', disabilityDisclosure:'Yes', gender:'Male', referralSource:'Don Nelson', referralAgency:'APO', program:'Anger Solutions', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-06-08', assessmentDate:'2026-06-15', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Kelsey Plum', dob:'1994-08-24', race:'White', disabilityDisclosure:'No', gender:'Female', referralSource:'Becky Hammond', referralAgency:'SSWB', program:'Seeking Safety', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-07-13', assessmentDate:'2026-07-13', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Kevin Durant', dob:'1988-09-29', race:'Black', disabilityDisclosure:'Yes', gender:'Male', referralSource:'Gregg Popovich', referralAgency:'APO', program:'Anger Solutions', region:'', riskLevel:'N/A', status:'Intake Completed - Not Accepted', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-07-05', assessmentDate:'2026-07-08', startDate:'', endDate:'', notes:[] },
+    { participantName:'Jordan Clarkson', dob:'1992-06-07', race:'East or Southeast Asian', disabilityDisclosure:'No', gender:'Male', referralSource:'Chuck Daly', referralAgency:'HMP', program:'Seeking Safety', region:'', riskLevel:'N/A', status:'Complete', location:'HMP', deliveryType:'Individual', reportCompleted:'', referralDate:'2026-02-10', assessmentDate:'2026-02-12', startDate:'2026-02-20', endDate:'2026-05-15', notes:[] },
+    { participantName:'Lauri Markkanen', dob:'1997-05-22', race:'White', disabilityDisclosure:'Prefer not to say', gender:'Male', referralSource:'Phil Jackson', referralAgency:'APO', program:'Anger Solutions', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-06-12', assessmentDate:'2026-06-20', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Jalen Brunson', dob:'1996-08-31', race:'White', disabilityDisclosure:'Prefer not to say', gender:'Male', referralSource:'Red Auerbach', referralAgency:'APO', program:'Safety and Repair (IPVIC)', region:"St. John's", riskLevel:'Medium', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-07-13', assessmentDate:'2026-07-13', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Kawhi Leonard', dob:'1991-06-29', race:'Black', disabilityDisclosure:'Prefer not to say', gender:'Male', referralSource:'Larry Brown', referralAgency:'HMP', program:'Seeking Safety', region:'', riskLevel:'N/A', status:'Complete', location:'HMP', deliveryType:'Individual', reportCompleted:'', referralDate:'2026-01-15', assessmentDate:'2026-01-20', startDate:'2026-02-05', endDate:'2026-04-25', notes:[] },
+    { participantName:'Stephen Curry', dob:'1988-03-14', race:'Black', disabilityDisclosure:'No', gender:'Male', referralSource:'Red Auerbach', referralAgency:'APO', program:'Safety and Repair (IPVIC)', region:"St. John's", riskLevel:'Low', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-06-10', assessmentDate:'2026-06-15', startDate:'2026-06-25', endDate:'', notes:[] },
+    { participantName:'Domantas Sabonis', dob:'1996-05-03', race:'White', disabilityDisclosure:'Yes', gender:'Male', referralSource:'Pat Riley', referralAgency:'APO', program:'Anger Solutions', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-06-15', assessmentDate:'2026-06-22', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Sue Bird', dob:'1980-10-16', race:'White', disabilityDisclosure:'No', gender:'Female', referralSource:'Becky Hammond', referralAgency:'SSWB', program:'Anger Solutions', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-07-12', assessmentDate:'2026-07-13', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Kyle Kuzma', dob:'1995-07-24', race:'White', disabilityDisclosure:'Yes', gender:'Male', referralSource:'Don Nelson', referralAgency:'APO', program:'Anger Solutions', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-06-22', assessmentDate:'2026-06-28', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Jeremy Lin', dob:'1988-08-23', race:'East or Southeast Asian', disabilityDisclosure:'No', gender:'Male', referralSource:'Phil Jackson', referralAgency:'APO', program:'Anger Solutions', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-06-05', assessmentDate:'2026-06-12', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Trae Young', dob:'1998-09-19', race:'White', disabilityDisclosure:'No', gender:'Male', referralSource:'Phil Jackson', referralAgency:'HMP', program:'Maintenance', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Individual', reportCompleted:'', referralDate:'2026-07-13', assessmentDate:'2026-07-13', startDate:'2026-07-13', endDate:'', notes:[] },
+    { participantName:'Blake Griffin', dob:'1989-03-16', race:'White', disabilityDisclosure:'No', gender:'Male', referralSource:'Pat Riley', referralAgency:'APO', program:'Dads', region:'', riskLevel:'N/A', status:'Ongoing', location:'Community', deliveryType:'Group', reportCompleted:'', referralDate:'2026-07-13', assessmentDate:'2026-07-13', startDate:'2026-07-13', endDate:'', notes:[] },
+];
+let practiceEditIndex = -1;
+let p_staleOnlyFilter = false;
+let p_tableColumns = [...DEFAULT_COLUMNS];
+
+function pVal(id) { const el = document.getElementById('p_' + id); return el ? el.value : ''; }
+function pSet(id, v) { const el = document.getElementById('p_' + id); if (el) el.value = v || ''; }
+
+function p_loadTableColumns() {
+    const saved = localStorage.getItem('practiceColumns_v' + APP_VERSION);
+    if (saved) { try { p_tableColumns = JSON.parse(saved); } catch { p_tableColumns = [...DEFAULT_COLUMNS]; } }
+    else { p_tableColumns = [...DEFAULT_COLUMNS]; }
+    p_tableColumns = p_tableColumns.filter(id => COLUMN_DEFS.some(c => c.id === id) && !LOCKED_COLUMNS.includes(id));
+    LOCKED_COLUMNS.forEach(id => { if (!p_tableColumns.includes(id)) p_tableColumns.push(id); });
+}
+function p_saveTableColumns() { localStorage.setItem('practiceColumns_v' + APP_VERSION, JSON.stringify(p_tableColumns)); }
+
+function p_toggleConditionalFields() {
+    const program = pVal('program');
+    document.getElementById('p_conditionalRow').className = isIPVIC(program) ? 'form-grid' : 'form-grid hidden-row';
+    const clinical = isClinicalCounselling(program);
+    document.getElementById('p_daysActiveGroup').style.display = clinical ? '' : 'none';
+    document.getElementById('p_deliveryTypeGroup').style.display = clinical ? 'none' : '';
+    const status = pVal('status');
+    const reportCompletedRelevant = status === 'Complete' || status === 'Disengaged';
+    document.getElementById('p_reportCompletedGroup').style.display = (!clinical && reportCompletedRelevant) ? '' : 'none';
+    if (clinical) p_updateDaysActive();
+}
+
+function p_updateDaysActive() {
+    const el = document.getElementById('p_daysActive');
+    if (!el) return;
+    const program = pVal('program');
+    const startVal = pVal('startDate');
+    if (!isClinicalCounselling(program) || !startVal) { el.value = ''; return; }
+    const start = new Date(startVal + 'T00:00:00');
+    const today = new Date(); today.setHours(0,0,0,0);
+    const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+    el.value = diffDays >= 0 ? diffDays + (diffDays === 1 ? ' day' : ' days') : '—';
+}
+
+const P_DATE_FIELD_ORDER = ['p_referralDate', 'p_assessmentDate', 'p_startDate', 'p_endDate'];
+function p_handleDateChange(changedId) {
+    const fullId = 'p_' + changedId;
+    const el = document.getElementById(fullId);
+    const value = el.value;
+    if (value) {
+        const idx = P_DATE_FIELD_ORDER.indexOf(fullId);
+        for (let i = 0; i < idx; i++) {
+            const earlierVal = document.getElementById(P_DATE_FIELD_ORDER[i]).value;
+            if (earlierVal && value < earlierVal) { el.value = ''; p_updateProgressBar(); return; }
+        }
+        for (let i = idx + 1; i < P_DATE_FIELD_ORDER.length; i++) {
+            const laterVal = document.getElementById(P_DATE_FIELD_ORDER[i]).value;
+            if (laterVal && value > laterVal) { el.value = ''; p_updateProgressBar(); return; }
+        }
+    }
+    p_updateProgressBar();
+    p_updateDateLocks();
+}
+
+function p_updateDateLocks() {
+    const referral    = pVal('referralDate');
+    const assessment  = pVal('assessmentDate');
+    const start       = pVal('startDate');
+    const assessmentEl = document.getElementById('p_assessmentDate');
+    const startEl      = document.getElementById('p_startDate');
+    const endEl        = document.getElementById('p_endDate');
+    assessmentEl.disabled = !referral;
+    startEl.disabled      = !(referral && assessment);
+    endEl.disabled        = !(referral && assessment && start);
+    if (assessmentEl.disabled) assessmentEl.value = '';
+    if (startEl.disabled)      startEl.value = '';
+    if (endEl.disabled)        endEl.value = '';
+}
+
+function p_updateProgressBar() {
+    const ids = ['p_referralDate','p_assessmentDate','p_startDate','p_endDate'];
+    const filled = ids.filter(id => document.getElementById(id).value).length;
+    const bar = document.getElementById('p_progressBar');
+    const pct = filled / ids.length * 100;
+    bar.style.width = pct + '%';
+    if (pct === 0)       bar.style.background = '';
+    else if (pct <= 25)  bar.style.background = '#32B9A3';
+    else if (pct <= 50)  bar.style.background = '#018170';
+    else if (pct <= 75)  bar.style.background = '#1c7289';
+    else                 bar.style.background = '#48bb78';
+    bar.classList.toggle('complete', filled === ids.length);
+    p_updateDaysActive();
+}
+
+function p_clearForm() {
+    const fields = ['participantName','dob','race','disabilityDisclosure','gender','referralSource','referralAgency',
+        'program','region','riskLevel','status','location','deliveryType','reportCompleted',
+        'referralDate','assessmentDate','startDate','endDate','daysActive','entryNote'];
+    fields.forEach(id => {
+        const el = document.getElementById('p_' + id);
+        if (!el) return;
+        if (el.tagName === 'SELECT') el.selectedIndex = 0;
+        else el.value = '';
+    });
+    practiceEditIndex = -1;
+    document.getElementById('p_addBtn').textContent = '➕ Add Entry';
+    document.getElementById('p_addBtn').className = 'btn-primary';
+    document.getElementById('p_formTitle').textContent = 'New Entry (Practice)';
+    p_toggleConditionalFields();
+    p_updateProgressBar();
+    p_updateDateLocks();
+}
+
+function p_unavailable() {
+    alert('This button is not available in Practice Mode. Please use the real Entries page to perform this action.');
+}
+
+function p_showBirthdays() {
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const birthdayPeople = practiceEntries.filter(e => {
+        if (!e.dob) return false;
+        const d = new Date(e.dob + 'T00:00:00');
+        return d.getMonth() === thisMonth;
+    }).sort((a, b) => {
+        const da = new Date(a.dob + 'T00:00:00');
+        const db = new Date(b.dob + 'T00:00:00');
+        return da.getDate() - db.getDate();
+    });
+    const list = document.getElementById('p_birthdayList');
+    if (birthdayPeople.length === 0) {
+        list.innerHTML = '<div style="color:var(--text-faint);font-size:13px;padding:8px 0;">No birthdays this month</div>';
+    } else {
+        const monthName = now.toLocaleString('default', { month: 'long' });
+        list.innerHTML = birthdayPeople.map(e => {
+            const d = new Date(e.dob + 'T00:00:00');
+            const day = d.getDate();
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--row-stripe);border-radius:8px;font-size:13px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:#805ad5;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;">${day}</div>
+                <div style="flex:1;color:var(--text);">${e.participantName || '—'}</div>
+                <div style="font-size:11px;color:var(--text-faint);">${monthName} ${day}</div>
+            </div>`;
+        }).join('');
+    }
+    document.getElementById('p_birthdayModal').style.display = 'flex';
+}
+
+function p_showStaleList() {
+    const staleEntries = practiceEntries.filter(e => isStaleEntry(e)).sort((a, b) => (a.participantName || '').localeCompare(b.participantName || ''));
+    const list = document.getElementById('p_staleList');
+    if (staleEntries.length === 0) {
+        list.innerHTML = '<div style="color:var(--text-faint);font-size:13px;padding:8px 0;">No stale entries</div>';
+    } else {
+        list.innerHTML = staleEntries.map(e => {
+            const days = staleDaysFor(e);
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--row-stripe);border-radius:8px;font-size:13px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:#F26B3D;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">${days}d</div>
+                <div style="flex:1;color:var(--text);">${e.participantName || '—'}</div>
+                <div style="font-size:11px;color:var(--text-faint);">${e.program || '—'}</div>
+            </div>`;
+        }).join('');
+    }
+    document.getElementById('p_staleModal').style.display = 'flex';
+}
+
+function p_showIncomplete() {
+    const incompleteEntries = practiceEntries.filter(e => !e.participantName || !e.dob || !e.race || !e.disabilityDisclosure || !e.gender || !e.referralSource || !e.referralAgency || !e.program || !e.location || !e.status || !e.deliveryType || !e.referralDate).sort((a, b) => (a.participantName || '').localeCompare(b.participantName || ''));
+    const list = document.getElementById('p_incompleteList');
+    const fieldLabels = { participantName: 'Name', dob: 'DOB', race: 'Race', disabilityDisclosure: 'Disability', gender: 'Gender', referralSource: 'Source', referralAgency: 'Agency', program: 'Program', location: 'Location', status: 'Status', deliveryType: 'Delivery', referralDate: 'Referral Date' };
+    if (incompleteEntries.length === 0) {
+        list.innerHTML = '<div style="color:var(--text-faint);font-size:13px;padding:8px 0;">All entries complete</div>';
+    } else {
+        list.innerHTML = incompleteEntries.map(e => {
+            const missing = Object.entries(fieldLabels).filter(([key]) => !e[key]).map(([, label]) => label);
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--row-stripe);border-radius:8px;font-size:13px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:var(--stat-orange);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">${missing.length}</div>
+                <div style="flex:1;color:var(--text);">${e.participantName || '—'}</div>
+                <div style="font-size:11px;color:var(--danger-text);">${missing.join(', ')}</div>
+            </div>`;
+        }).join('');
+    }
+    document.getElementById('p_incompleteModal').style.display = 'flex';
+}
+
+let p_dashPeriod = 'month';
+
+function p_toggleView(view) {
+    const tableView = document.getElementById('p_viewTable');
+    const dashView = document.getElementById('p_viewDashboard');
+    const tableBtn = document.getElementById('p_toggleTableViewBtn');
+    const dashBtn = document.getElementById('p_toggleDashViewBtn');
+    const headerTitle = document.getElementById('p_headerTitle');
+    if (view === 'dashboard') {
+        tableView.style.display = 'none';
+        dashView.style.display = 'block';
+        headerTitle.style.display = 'none';
+        dashBtn.style.background = '#32B9A3';
+        dashBtn.style.color = '#fff';
+        tableBtn.style.background = '';
+        tableBtn.style.color = '';
+        p_renderDashboard();
+    } else {
+        tableView.style.display = 'block';
+        dashView.style.display = 'none';
+        headerTitle.style.display = '';
+        tableBtn.style.background = '#32B9A3';
+        tableBtn.style.color = '#fff';
+        dashBtn.style.background = '';
+        dashBtn.style.color = '';
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function p_setDashPeriod(period) {
+    p_dashPeriod = period;
+    document.getElementById('p_toggleMonth').className = period === 'month' ? 'btn-primary' : 'btn-secondary';
+    document.getElementById('p_toggleThisMonth').className = period === 'thisMonth' ? 'btn-primary' : 'btn-secondary';
+    document.getElementById('p_toggleYear').className = period === 'year' ? 'btn-primary' : 'btn-secondary';
+    document.getElementById('p_toggleCustom').className = period === 'custom' ? 'btn-primary' : 'btn-secondary';
+    document.getElementById('p_toggleMonth').style.background = period === 'month' ? '#1c7289' : '';
+    document.getElementById('p_toggleThisMonth').style.background = period === 'thisMonth' ? '#1c7289' : '';
+    document.getElementById('p_toggleYear').style.background = period === 'year' ? '#1c7289' : '';
+    document.getElementById('p_toggleCustom').style.background = period === 'custom' ? '#1c7289' : '';
+    document.getElementById('p_customRangeRow').style.display = period === 'custom' ? 'flex' : 'none';
+    p_renderDashboard();
+}
+
+function p_applyCustomRange() { p_renderDashboard(); }
+function p_clearCustomRange() {
+    document.getElementById('p_customFrom').value = '';
+    document.getElementById('p_customTo').value = '';
+    p_renderDashboard();
+}
+
+function p_renderDashboard() {
+    const now = new Date();
+    const todayStr = now.toISOString().slice(0, 10);
+    let filtered, subtitle;
+    if (p_dashPeriod === 'month') {
+        filtered = practiceEntries.filter(e => !isStaleEntry(e));
+        subtitle = 'Current active caseload';
+    } else if (p_dashPeriod === 'thisMonth') {
+        const thisMonth = now.getMonth();
+        const thisYear = now.getFullYear();
+        const monthStart = new Date(thisYear, thisMonth, 1).toISOString().slice(0, 10);
+        const monthEnd = new Date(thisYear, thisMonth + 1, 0).toISOString().slice(0, 10);
+        filtered = practiceEntries.filter(e => {
+            const dates = [e.referralDate, e.assessmentDate, e.startDate, e.endDate].filter(Boolean);
+            return dates.some(d => d >= monthStart && d <= monthEnd);
+        });
+        subtitle = now.toLocaleString('default', { month: 'long', year: 'numeric' }) + ' — entries with activity this month';
+    } else if (p_dashPeriod === 'year') {
+        const cutoff = new Date(now);
+        cutoff.setFullYear(cutoff.getFullYear() - 1);
+        const cutoffStr = cutoff.toISOString().slice(0, 10);
+        filtered = practiceEntries.filter(e => { const d = e.referralDate || e.startDate; return d && d >= cutoffStr && d <= todayStr; });
+        subtitle = 'Stats from ' + cutoff.toLocaleString('default', { month: 'long', day: 'numeric', year: 'numeric' }) + ' to ' + now.toLocaleString('default', { month: 'long', day: 'numeric', year: 'numeric' });
+    } else {
+        const fromVal = document.getElementById('p_customFrom').value;
+        const toVal = document.getElementById('p_customTo').value;
+        if (!fromVal || !toVal) { filtered = []; subtitle = 'Custom range — select both dates above to filter'; }
+        else {
+            filtered = practiceEntries.filter(e => { const d = e.referralDate || e.startDate; return d && d >= fromVal && d <= toVal; });
+            const fmt = v => new Date(v + 'T00:00:00').toLocaleString('default', { month: 'long', day: 'numeric', year: 'numeric' });
+            subtitle = 'Stats from ' + fmt(fromVal) + ' to ' + fmt(toVal);
+        }
+    }
+    document.getElementById('p_dashSubtitle').textContent = subtitle;
+    let dateStart = null, dateEnd = null;
+    if (p_dashPeriod === 'thisMonth') {
+        const y = now.getFullYear(), m = now.getMonth();
+        dateStart = new Date(y, m, 1).toISOString().slice(0,10);
+        dateEnd = new Date(y, m + 1, 0).toISOString().slice(0,10);
+    } else if (p_dashPeriod === 'year') {
+        const c = new Date(now); c.setFullYear(c.getFullYear() - 1);
+        dateStart = c.toISOString().slice(0,10); dateEnd = todayStr;
+    } else if (p_dashPeriod === 'custom') {
+        dateStart = document.getElementById('p_customFrom').value || null;
+        dateEnd = document.getElementById('p_customTo').value || null;
+    }
+    const inRange = d => d && dateStart && dateEnd && d >= dateStart && d <= dateEnd;
+    const countReferrals = p_dashPeriod === 'month' ? filtered.filter(e=>e.referralDate).length : filtered.filter(e=>inRange(e.referralDate)).length;
+    const countAssess = p_dashPeriod === 'month' ? filtered.filter(e=>e.assessmentDate).length : filtered.filter(e=>inRange(e.assessmentDate)).length;
+    const countStart = p_dashPeriod === 'month' ? filtered.filter(e=>e.startDate).length : filtered.filter(e=>inRange(e.startDate)).length;
+    const countComplete = p_dashPeriod === 'month' ? filtered.filter(e=>e.endDate).length : filtered.filter(e=>inRange(e.endDate)).length;
+    document.getElementById('p_statGrid').innerHTML = `
+        <div class="stat-card"><div class="stat-icon blue">👥</div><div><div class="stat-label">Total Participants</div><div class="stat-value">${filtered.length}</div></div></div>
+        <div class="stat-card"><div class="stat-icon purple">📨</div><div><div class="stat-label">Referrals Received</div><div class="stat-value">${countReferrals}</div></div></div>
+        <div class="stat-card"><div class="stat-icon orange">📋</div><div><div class="stat-label">Assessments Completed</div><div class="stat-value">${countAssess}</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue">🚀</div><div><div class="stat-label">Started Program</div><div class="stat-value">${countStart}</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">🎓</div><div><div class="stat-label">Completed Program</div><div class="stat-value">${countComplete}</div></div></div>
+    `;
+    const msgs = [];
+    const staleEntries = practiceEntries.filter(e => isStaleEntry(e));
+    if (staleEntries.length > 0) {
+        msgs.push(`<div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="p_showStaleList()"><div class="stat-icon" style="background:#F26B3D;color:#fff;width:32px;height:32px;border-radius:8px;font-size:14px;">⚠️</div><div><div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Stale Entries</div><div style="font-size:20px;font-weight:800;color:var(--text);">${staleEntries.length}<span style="font-size:12px;font-weight:400;color:var(--text-faint); margin-left:4px;">click to view</span></div></div></div>`);
+    }
+    const incompleteEntries = practiceEntries.filter(e => !e.participantName || !e.dob || !e.race || !e.disabilityDisclosure || !e.gender || !e.referralSource || !e.referralAgency || !e.program || !e.location || !e.status || !e.deliveryType || !e.referralDate);
+    if (incompleteEntries.length > 0) {
+        msgs.push(`<div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="p_showIncomplete()"><div class="stat-icon orange" style="width:32px;height:32px;border-radius:8px;font-size:14px;">📝</div><div><div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Incomplete Entries</div><div style="font-size:20px;font-weight:800;color:var(--text);">${incompleteEntries.length}<span style="font-size:12px;font-weight:400;color:var(--text-faint); margin-left:4px;">click to view</span></div></div></div>`);
+    }
+    const nowMsg = new Date();
+    const thisMonth = nowMsg.getMonth();
+    const thisYear = nowMsg.getFullYear();
+    const birthdayPeople = practiceEntries.filter(e => {
+        if (!e.dob) return false;
+        const d = new Date(e.dob + 'T00:00:00');
+        return d.getMonth() === thisMonth;
+    });
+    if (birthdayPeople.length > 0) {
+        msgs.push(`<div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="p_showBirthdays()"><div class="stat-icon purple" style="width:32px;height:32px;border-radius:8px;font-size:14px;">🎂</div><div><div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Birthdays This Month</div><div style="font-size:20px;font-weight:800;color:var(--text);">${birthdayPeople.length}<span style="font-size:12px;font-weight:400;color:var(--text-faint); margin-left:4px;">click to view</span></div></div></div>`);
+    }
+    const endOfMonth = new Date(thisYear, thisMonth + 1, 0);
+    const daysUntilReport = Math.ceil((endOfMonth - nowMsg) / 86400000);
+    const reportColor = daysUntilReport <= 7 ? 'red' : 'blue';
+    document.getElementById('p_dashMessages').innerHTML = `
+        <div class="card" style="padding:16px 20px;"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;">Messages</div><div style="display:flex;gap:32px;flex-wrap:wrap;">${msgs.length ? msgs.join('') : '<div style="color:var(--text-faint);font-size:13px;">All clear</div>'}</div></div>
+        <div class="card" style="padding:16px 20px;display:flex;flex-direction:column;justify-content:center;align-items:center;"><div class="stat-icon ${reportColor}" style="width:36px;height:36px;border-radius:9px;font-size:18px;margin-bottom:8px;">📅</div><div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Report Due</div><div style="font-size:26px;font-weight:800;color:var(--text);">${daysUntilReport}<span style="font-size:13px;font-weight:400;color:var(--text-faint);"> days</span></div><div style="font-size:12px;color:var(--text-faint);margin-top:2px;">${endOfMonth.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div></div>
+    `;
+    const progCounts = {};
+    filtered.forEach(e => { const p = e.program || 'Unknown'; progCounts[p] = (progCounts[p]||0) + 1; });
+    const progEntries = Object.entries(progCounts).sort((a,b) => b[1]-a[1]);
+    const donutEl = document.getElementById('p_dashDonut');
+    const DONUT_COLORS = ['#092E42','#1c7289','#32B9A3','#018170','#F26B3D','#805ad5','#2b6cb0'];
+    if (progEntries.length === 0) {
+        donutEl.innerHTML = '<div style="color:var(--text-faint);font-size:13px;">No data</div>';
+    } else {
+        const total = filtered.length;
+        let cumPct = 0;
+        const segments = progEntries.map(([name, count], i) => {
+            const pct = (count / total) * 100;
+            const color = DONUT_COLORS[i % DONUT_COLORS.length];
+            const start = cumPct;
+            cumPct += pct;
+            return { name, count, color, start, pct };
+        });
+        const gradient = segments.map(s => `${s.color} ${s.start}% ${s.start + s.pct}%`).join(', ');
+        const legend = segments.map(s => `<div class="dash-donut-legend-item"><div class="dash-donut-legend-swatch" style="background:${s.color};"></div><span class="dash-donut-legend-label">${s.name}</span><span class="dash-donut-legend-val">${s.count}</span></div>`).join('');
+        donutEl.innerHTML = `<div class="dash-donut" style="background:conic-gradient(${gradient});"><div class="dash-donut-hole">${total}</div></div><div class="dash-donut-legend">${legend}</div>`;
+    }
+    const avgDaysEl = document.getElementById('p_dashAvgDays');
+    const withReferral = filtered.filter(e => e.referralDate);
+    if (withReferral.length === 0) {
+        avgDaysEl.innerHTML = '<div style="color:var(--text-faint);font-size:13px;">No entries with referral dates</div>';
+    } else {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const daysList = withReferral.map(e => {
+            const s = new Date(e.referralDate + 'T00:00:00');
+            const en = e.endDate ? new Date(e.endDate + 'T00:00:00') : today;
+            return Math.round((en - s) / 86400000);
+        }).filter(d => d >= 0);
+        if (daysList.length === 0) {
+            avgDaysEl.innerHTML = '<div style="color:var(--text-faint);font-size:13px;">No valid date ranges</div>';
+        } else {
+            const avg = Math.round(daysList.reduce((a,b) => a+b, 0) / daysList.length);
+            const byProgram = {};
+            withReferral.forEach(e => {
+                const p = e.program || 'Unknown';
+                const en = e.endDate ? new Date(e.endDate+'T00:00:00') : today;
+                const d = Math.round((en - new Date(e.referralDate+'T00:00:00')) / 86400000);
+                if (d >= 0) { if (!byProgram[p]) byProgram[p] = []; byProgram[p].push(d); }
+            });
+            const progRows = Object.entries(byProgram).map(([name, vals]) => {
+                const progAvg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+                return `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid var(--border);"><span style="color:var(--text);">${name}</span><span style="font-weight:700;color:var(--text);">${progAvg} days <span style="color:var(--text-faint);font-weight:400;">(${vals.length})</span></span></div>`;
+            }).join('');
+            avgDaysEl.innerHTML = `
+                <div style="text-align:center;margin-bottom:16px;">
+                    <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Average Days Active</div>
+                    <div style="font-size:28px;font-weight:800;color:var(--text);">${avg}<span style="font-size:14px;font-weight:400;color:var(--text-faint);"> days</span></div>
+                </div>
+                <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">By Program</div>
+                ${progRows}
+            `;
+        }
+    }
+}
+
+function p_saveEntry() {
+    const participantName = document.getElementById('p_participantName').value.trim();
+    if (!participantName) { alert('Please enter a Participant Name.'); return; }
+    const program = pVal('program');
+    const entry = {
+        participantName, dob: pVal('dob'), race: pVal('race'), disabilityDisclosure: pVal('disabilityDisclosure'),
+        gender: pVal('gender'), referralSource: pVal('referralSource'), referralAgency: pVal('referralAgency'), program,
+        region: isIPVIC(program) ? pVal('region') : '',
+        riskLevel: isIPVIC(program) ? pVal('riskLevel') : 'N/A',
+        status: pVal('status'), location: pVal('location'),
+        daysActive: isClinicalCounselling(program) ? document.getElementById('p_daysActive').value : '',
+        deliveryType: pVal('deliveryType'),
+        reportCompleted: (pVal('status') === 'Complete' || pVal('status') === 'Disengaged') ? pVal('reportCompleted') : '',
+        referralDate: pVal('referralDate'), assessmentDate: pVal('assessmentDate'),
+        startDate: pVal('startDate'), endDate: pVal('endDate'),
+        notes: (practiceEditIndex !== -1 && practiceEntries[practiceEditIndex] && practiceEntries[practiceEditIndex].notes) ? practiceEntries[practiceEditIndex].notes : [],
+    };
+    const noteText = document.getElementById('p_entryNote').value.trim();
+    if (noteText) entry.notes.push({ text: noteText, date: new Date().toLocaleString() });
+    if (practiceEditIndex === -1) practiceEntries.push(entry);
+    else { practiceEntries[practiceEditIndex] = entry; practiceEditIndex = -1; }
+    p_clearForm();
+    p_renderTable();
+}
+
+function p_editEntry(i) {
+    practiceEditIndex = i;
+    const e = practiceEntries[i];
+    document.getElementById('p_participantName').value = e.participantName || '';
+    document.getElementById('p_dob').value = e.dob || '';
+    document.getElementById('p_race').value = e.race || '';
+    document.getElementById('p_disabilityDisclosure').value = e.disabilityDisclosure || '';
+    document.getElementById('p_gender').value = e.gender || '';
+    document.getElementById('p_referralSource').value = e.referralSource || '';
+    document.getElementById('p_referralAgency').value = e.referralAgency || '';
+    document.getElementById('p_program').value = e.program || '';
+    document.getElementById('p_region').value = e.region || '';
+    document.getElementById('p_riskLevel').value = e.riskLevel || 'N/A';
+    document.getElementById('p_status').value = e.status || '';
+    document.getElementById('p_location').value = e.location || '';
+    document.getElementById('p_deliveryType').value = e.deliveryType || '';
+    document.getElementById('p_reportCompleted').value = e.reportCompleted || 'N/A';
+    p_toggleConditionalFields();
+    document.getElementById('p_referralDate').value = e.referralDate || '';
+    document.getElementById('p_assessmentDate').value = e.assessmentDate || '';
+    document.getElementById('p_startDate').value = e.startDate || '';
+    document.getElementById('p_endDate').value = e.endDate || '';
+    p_updateDaysActive();
+    p_updateDateLocks();
+    document.getElementById('p_addBtn').textContent = '💾 Save Changes';
+    document.getElementById('p_addBtn').className = 'btn-save';
+    document.getElementById('p_formTitle').textContent = 'Edit Entry (Practice)';
+    p_updateProgressBar();
+    window.scrollTo(0, 0);
+}
+
+function p_deleteEntry(i) {
+    if (!confirm('Delete this practice entry?')) return;
+    practiceEntries.splice(i, 1);
+    p_renderTable();
+}
+
+function p_toggleStaleOnlyFilter() {
+    p_staleOnlyFilter = !p_staleOnlyFilter;
+    p_renderTable();
+}
+
+function p_renderTable() {
+    const head = document.querySelector('#p_tableHead tr');
+    const body = document.getElementById('p_tableBody');
+    const empty = document.getElementById('p_emptyState');
+    if (!head || !body) return;
+    head.innerHTML = p_tableColumns.map(id => {
+        const col = getColDef(id);
+        return `<th class="${col.cssClass}">${col.label}</th>`;
+    }).join('');
+    const q = (document.getElementById('p_searchInput')?.value || '').toLowerCase();
+    const progFilter = document.getElementById('p_programFilter')?.value || '';
+    const locFilter = document.getElementById('p_locationFilter')?.value || '';
+    const statFilter = document.getElementById('p_statusFilter')?.value || '';
+    const filtered = practiceEntries.filter(e => {
+        const matchQ = !q || (e.participantName || '').toLowerCase().includes(q);
+        return matchQ && (!progFilter || e.program === progFilter) && (!locFilter || e.location === locFilter) && (!statFilter || e.status === statFilter) && (!p_staleOnlyFilter || isStaleEntry(e));
+    });
+    const staleEntries = practiceEntries.filter(isStaleEntry);
+    const banner = document.getElementById('p_staleBanner');
+    const btn = document.getElementById('p_staleFilterBtn');
+    if (staleEntries.length === 0) { banner.classList.remove('visible'); p_staleOnlyFilter = false; }
+    else {
+        banner.classList.add('visible');
+        document.getElementById('p_staleBannerText').textContent = staleEntries.length + ' entr' + (staleEntries.length === 1 ? 'y has' : 'ies have') + ' been Complete/Disengaged for ' + STALE_DAYS_THRESHOLD + '+ days';
+        btn.textContent = p_staleOnlyFilter ? 'Show all entries' : 'Show only these';
+    }
+    if (filtered.length === 0) { body.innerHTML = ''; empty.style.display = ''; return; }
+    empty.style.display = 'none';
+    body.innerHTML = filtered.map(e => {
+        const i = practiceEntries.indexOf(e);
+        const stale = isStaleEntry(e);
+        const cells = p_tableColumns.map(id => {
+            const col = getColDef(id);
+            return `<td class="${col.cssClass}">${col.getValue(e, i, stale)}</td>`;
+        }).join('');
+        return `<tr class="${stale ? 'stale-row' : ''}">${cells}</tr>`;
+    }).join('');
+}
+
+function p_toggleColumnPanel() {
+    const modal = document.getElementById('p_columnModal');
+    const visible = modal.style.display !== 'none';
+    modal.style.display = visible ? 'none' : 'flex';
+    if (!visible) p_renderColumnList();
+}
+
+function p_renderColumnList() {
+    const list = document.getElementById('p_columnList');
+    const nonLocked = COLUMN_DEFS.filter(c => !LOCKED_COLUMNS.includes(c.id));
+    const nonLockedIds = nonLocked.map(c => c.id);
+    const visible = p_tableColumns.filter(id => nonLockedIds.includes(id));
+    const hidden = nonLockedIds.filter(id => !p_tableColumns.includes(id));
+    const allOrdered = [...visible, ...hidden];
+    list.innerHTML = allOrdered.map(id => {
+        const col = getColDef(id);
+        const isVisible = p_tableColumns.includes(id);
+        return `<div class="col-drag-item" draggable="${isVisible}" data-col-id="${id}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--row-stripe);border-radius:8px;font-size:13px;${isVisible?'':'opacity:0.5;'}${isVisible?'cursor:grab;':'cursor:default;'}">
+            <input type="checkbox" ${isVisible?'checked':''} onchange="p_toggleColumnVisibility('${id}', this.checked)" style="cursor:pointer;">
+            <span style="flex:1;color:var(--text);user-select:none;">${isVisible?'\u2807 ':''}${col.label}</span>
+        </div>`;
+    }).join('');
+    list.querySelectorAll('.col-drag-item[draggable="true"]').forEach(el => {
+        el.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', el.dataset.colId); e.dataTransfer.effectAllowed = 'move'; el.classList.add('col-dragging'); });
+        el.addEventListener('dragend', e => { el.classList.remove('col-dragging'); list.querySelectorAll('.col-drag-over').forEach(x => x.classList.remove('col-drag-over')); });
+        el.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; el.classList.add('col-drag-over'); });
+        el.addEventListener('dragleave', e => { el.classList.remove('col-drag-over'); });
+        el.addEventListener('drop', e => {
+            e.preventDefault(); el.classList.remove('col-drag-over');
+            const fromId = e.dataTransfer.getData('text/plain');
+            const toId = el.dataset.colId;
+            if (fromId === toId || LOCKED_COLUMNS.includes(toId)) return;
+            const fromIdx = p_tableColumns.indexOf(fromId);
+            const origToIdx = p_tableColumns.indexOf(toId);
+            if (fromIdx === -1 || origToIdx === -1) return;
+            p_tableColumns.splice(fromIdx, 1);
+            const newToIdx = p_tableColumns.indexOf(toId);
+            p_tableColumns.splice(newToIdx + (fromIdx < origToIdx ? 1 : 0), 0, fromId);
+            p_saveTableColumns(); p_renderTable(); p_renderColumnList();
+        });
+    });
+}
+
+function p_toggleColumnVisibility(id, show) {
+    if (LOCKED_COLUMNS.includes(id)) return;
+    if (show && !p_tableColumns.includes(id)) { p_tableColumns.splice(p_tableColumns.length - LOCKED_COLUMNS.length, 0, id); }
+    else if (!show) { p_tableColumns = p_tableColumns.filter(c => c !== id); }
+    p_saveTableColumns(); p_renderTable(); p_renderColumnList();
+}
+
+// ── Practice Tutorial ─────────────────────────────────────────
+let p_tutorialStep = 0;
+let p_tutorialActive = false;
+const p_tutorialSteps = [
+    { section: 'sidebar', title: 'Sidebar Navigation', text: 'The sidebar on the left is how you navigate the app. It has six pages: Dashboard (overview and stats), Entries (add and manage records), Archive (monthly report snapshots), Admin (report summaries), Settings (preferences and updates), and Help (FAQ and support). Click any button to switch pages.' },
+    { section: 'dashboard', title: 'Dashboard', text: 'This is your Dashboard. It shows stat cards, a message board, program distribution donut, and average days active — all powered by your entries. Use the period buttons (Active Now, This Month, This Year, Custom Range) to filter. Nothing here affects your real data. To help show you around, this dashboard has been pre-filled with data — but don\'t worry, you\'ll be building your dashboard with a clean slate!' },
+    { section: null, title: 'Entries', text: 'This is your entries page. This section is used for adding data about your participants.' },
+    { section: 'participant', title: 'Participant Information', text: 'Start with the basics — participant name and date of birth on the first row, then gender, racial identity, and disability disclosure on the second row. Name and DOB are the most important for identifying participants.' },
+    { section: 'referral', title: 'Referral Details', text: 'Record who referred the participant and which agency they came from. Then choose the program they\'re enrolled in. Some programs (like IPVIC) will reveal extra fields below.' },
+    { section: 'timeline', title: 'Timeline & Dates', text: 'Track the journey from referral through assessment, start, and end. Dates lock in order — you can\'t set a Start Date without first entering a Referral and Assessment Date. The progress bar fills as you go.' },
+    { section: 'status', title: 'Status & Delivery', text: 'Set the current status (Awaiting Intake, Ongoing, Complete, etc.) and whether sessions are Individual or Group. If you mark someone Complete or Disengaged, a "Report Completed" field appears.' },
+    { section: 'notes', title: 'Notes', text: 'Add optional notes to any entry — things like session observations, follow-up reminders, or important context. Notes are saved with a timestamp.' },
+    { section: 'actions', title: 'Adding, Editing & Actions', text: 'Click "Add Entry" to save a new record, or "Clear" to reset the form. "Wipe All Data" clears all entries permanently. On the right side: "Submit" saves a local backup, "Email Report" sends data via email, and "Download" exports a file. To edit an existing entry, click the Edit button in the table below.' },
+    { section: 'table', title: 'Table, Search & Filters', text: 'Your entries appear in the table below. Use the search bar to find participants, or filter by Program, Location, or Status. Click "Customize Columns" to show/hide and reorder columns. Stale entries (Complete/Disengaged for 30+ days) are highlighted with a warning.' },
+    { section: 'archive', title: 'Archive Page', text: 'The Archive page lets you save monthly snapshots of your data. Click "Archive Current Month" to capture all entries as they stand right now. Past archives appear in a list below — each one is a frozen snapshot you can refer back to, even if entries change later.' },
+    { section: 'help', title: 'Help Page', text: 'The Help page has three sections: a contact card to email support, the Entries button, and a Frequently Asked Questions accordion covering topics like how to submit reports, what JSON files are, and how to set up email recipients.' },
+    { section: 'settings', title: 'Settings Page', text: 'Settings has four sections: About (version info, What\'s New, and update checker), Report Settings (switch between LRP and New Day report modes, set your staff name), Submission (add default email recipients for the Email Report feature), and Display (Dark Mode, Color Blind Mode, and a fun logo light toggle).' },
+    { section: null, title: 'You\'re Ready!', text: 'That\'s everything! You can head to your real Entries page when you feel ready, or stay here and practice adding a few entries first. There\'s no wrong choice — you can always come back to the sandbox from the Help page.', isFinal: true },
+];
+
+function p_startTutorial() {
+    p_tutorialActive = true;
+    p_tutorialStep = 0;
+    document.getElementById('p_tutorialPanel').style.display = 'block';
+    p_toggleView('dashboard');
+    p_renderTutorialStep();
+}
+
+function p_endTutorial() {
+    p_tutorialActive = false;
+    document.getElementById('p_tutorialPanel').style.display = 'none';
+    document.querySelectorAll('[data-tutorial-section]').forEach(el => el.classList.remove('tutorial-highlight'));
+}
+
+function p_tutorialNav(dir) {
+    p_tutorialStep += dir;
+    if (p_tutorialStep >= p_tutorialSteps.length) { p_endTutorial(); return; }
+    if (p_tutorialStep < 0) { p_tutorialStep = 0; return; }
+    p_renderTutorialStep();
+}
+
+function p_renderTutorialStep() {
+    const step = p_tutorialSteps[p_tutorialStep];
+    document.getElementById('p_tutorialStepLabel').textContent = 'Step ' + (p_tutorialStep + 1) + ' of ' + p_tutorialSteps.length;
+    document.getElementById('p_tutorialTitle').textContent = step.title;
+    document.getElementById('p_tutorialText').textContent = step.text;
+    document.getElementById('p_tutorialPrev').style.display = p_tutorialStep === 0 ? 'none' : '';
+    const isFinal = step.isFinal;
+    document.getElementById('p_tutorialNext').style.display = isFinal ? 'none' : '';
+    document.getElementById('p_tutorialFinalBtns').style.display = isFinal ? 'flex' : 'none';
+    document.querySelectorAll('[data-tutorial-section]').forEach(el => el.classList.remove('tutorial-highlight'));
+    if (step.section === 'dashboard') {
+        showPage('practice', null);
+        p_toggleView('dashboard');
+    } else if (step.section === 'sidebar') {
+        showPage('practice', null);
+    } else if (step.section === 'archive') {
+        showPage('archive', null);
+    } else if (step.section === 'help-contact') {
+        showPage('help', null);
+    } else if (step.section === 'settings') {
+        showPage('settings', null);
+    } else {
+        showPage('practice', null);
+        const tableView = document.getElementById('p_viewTable');
+        if (tableView.style.display === 'none') p_toggleView('table');
+    }
+    if (step.section) {
+        const targets = document.querySelectorAll('[data-tutorial-section="' + step.section + '"]');
+        if (targets.length) {
+            targets.forEach(el => el.classList.add('tutorial-highlight'));
+            targets[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
 </script>
 <div id="columnModal" style="display:none;position:fixed;inset:0;background:var(--overlay);z-index:1250;align-items:center;justify-content:center;">
     <div style="background:var(--card-bg);border-radius:14px;padding:24px 28px;max-width:420px;width:90%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px var(--shadow-strong);">
@@ -3305,6 +4142,33 @@ renderUploadList();
             <button class="btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="toggleColumnPanel()">✕ Close</button>
         </div>
         <div id="columnList" style="display:flex;flex-direction:column;gap:5px;overflow-y:auto;flex:1;"></div>
+    </div>
+</div>
+<!-- Practice column modal -->
+<div id="p_columnModal" style="display:none;position:fixed;inset:0;background:var(--overlay);z-index:1250;align-items:center;justify-content:center;">
+    <div style="background:var(--card-bg);border-radius:14px;padding:24px 28px;max-width:420px;width:90%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px var(--shadow-strong);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div style="font-size:15px;font-weight:700;color:var(--text);">Customize Columns</div>
+            <button class="btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="p_toggleColumnPanel()">✕ Close</button>
+        </div>
+        <div id="p_columnList" style="display:flex;flex-direction:column;gap:5px;overflow-y:auto;flex:1;"></div>
+    </div>
+</div>
+<!-- Tutorial floating panel -->
+<div id="p_tutorialPanel" style="display:none;position:fixed;bottom:24px;right:24px;z-index:1300;max-width:380px;width:90%;background:var(--card-bg);border-radius:14px;padding:20px 24px;box-shadow:0 8px 32px var(--shadow-strong);border:2px solid #1c7289;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);"><span id="p_tutorialStepLabel">Step 1 of 8</span></div>
+        <button class="btn-secondary" style="padding:3px 8px;font-size:11px;" onclick="p_endTutorial()">✕ Skip</button>
+    </div>
+    <div id="p_tutorialTitle" style="font-size:15px;font-weight:700;color:#1c7289;margin-bottom:6px;"></div>
+    <div id="p_tutorialText" style="font-size:13px;color:var(--text);line-height:1.5;margin-bottom:16px;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn-secondary" id="p_tutorialPrev" onclick="p_tutorialNav(-1)" style="padding:6px 14px;font-size:12px;">← Back</button>
+        <button class="btn-primary" id="p_tutorialNext" onclick="p_tutorialNav(1)" style="padding:6px 14px;font-size:12px;background:#1c7289;">Next →</button>
+        <div id="p_tutorialFinalBtns" style="display:none;gap:8px;width:100%;">
+            <button class="btn-secondary" onclick="p_endTutorial(); showPage('practice', null);" style="flex:1;padding:6px 14px;font-size:12px;">Practice Sandbox</button>
+            <button class="btn-primary" onclick="p_endTutorial(); showPage('entries', null);" style="flex:1;padding:6px 14px;font-size:12px;background:#1c7289;">Go to Entries</button>
+        </div>
     </div>
 </div>
 <div id="birthdayModal" style="display:none;position:fixed;inset:0;background:var(--overlay);z-index:1250;align-items:center;justify-content:center;">
@@ -3332,6 +4196,33 @@ renderUploadList();
             <button class="btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="document.getElementById('incompleteModal').style.display='none'">✕ Close</button>
         </div>
         <div id="incompleteList" style="display:flex;flex-direction:column;gap:5px;overflow-y:auto;flex:1;"></div>
+    </div>
+</div>
+<div id="p_birthdayModal" style="display:none;position:fixed;inset:0;background:var(--overlay);z-index:1250;align-items:center;justify-content:center;">
+    <div style="background:var(--card-bg);border-radius:14px;padding:24px 28px;max-width:420px;width:90%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px var(--shadow-strong);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div style="font-size:15px;font-weight:700;color:var(--text);">🎂 Birthdays This Month</div>
+            <button class="btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="document.getElementById('p_birthdayModal').style.display='none'">✕ Close</button>
+        </div>
+        <div id="p_birthdayList" style="display:flex;flex-direction:column;gap:5px;overflow-y:auto;flex:1;"></div>
+    </div>
+</div>
+<div id="p_staleModal" style="display:none;position:fixed;inset:0;background:var(--overlay);z-index:1250;align-items:center;justify-content:center;">
+    <div style="background:var(--card-bg);border-radius:14px;padding:24px 28px;max-width:420px;width:90%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px var(--shadow-strong);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div style="font-size:15px;font-weight:700;color:var(--text);">⚠️ Stale Entries</div>
+            <button class="btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="document.getElementById('p_staleModal').style.display='none'">✕ Close</button>
+        </div>
+        <div id="p_staleList" style="display:flex;flex-direction:column;gap:5px;overflow-y:auto;flex:1;"></div>
+    </div>
+</div>
+<div id="p_incompleteModal" style="display:none;position:fixed;inset:0;background:var(--overlay);z-index:1250;align-items:center;justify-content:center;">
+    <div style="background:var(--card-bg);border-radius:14px;padding:24px 28px;max-width:420px;width:90%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px var(--shadow-strong);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div style="font-size:15px;font-weight:700;color:var(--text);">📝 Incomplete Entries</div>
+            <button class="btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="document.getElementById('p_incompleteModal').style.display='none'">✕ Close</button>
+        </div>
+        <div id="p_incompleteList" style="display:flex;flex-direction:column;gap:5px;overflow-y:auto;flex:1;"></div>
     </div>
 </div>
 <div id="whatsNewModal" style="display:none;position:fixed;inset:0;background:var(--overlay);z-index:1250;align-items:center;justify-content:center;">
