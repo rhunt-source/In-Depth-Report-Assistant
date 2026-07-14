@@ -26,3 +26,9 @@ src-tauri/gen/
 *.njsproj
 *.sln
 *.sw?
+
+# Signing keys and source images
+src-tauri/tauri.key
+src-tauri/appicon-source.png
+gen-ico.js
+icon.ico.png

@@ -50,6 +50,7 @@
         { "url": "mailto:*" }
       ]
     },
-    "updater:default"
+    "updater:default",
+    "process:default"
   ]
 }

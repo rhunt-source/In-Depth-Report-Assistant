@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>In Depth Report Assistant</title>
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<script src="app.js"></script>
     <style>
         :root {
             --bg: #f0f4f8;
@@ -126,13 +127,13 @@
         /* --- Angler fish lure glow ---
            Adjust --lure-x / --lure-y (percentages of the logo image's width/
            height) to line the glow dot up exactly with the lure in the art. */
-        .logo-wrap { position: relative; display: inline-block; --lure-x: 20%; --lure-y: 29%; }
+        .logo-wrap { position: relative; display: inline-block; --lure-x: 13%; --lure-y: 25%; }
         .lure-glow {
             position: absolute;
             top: var(--lure-y);
             left: var(--lure-x);
-            width: 10px;
-            height: 10px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             background: radial-gradient(circle, #fffbe0 0%, #ffe066 35%, rgba(255,200,60,0) 75%);
@@ -147,11 +148,11 @@
         }
         @keyframes lure-pulse {
             0%, 100% {
-                box-shadow: 0 0 6px 2px rgba(255, 224, 102, 0.55), 0 0 16px 6px rgba(255, 200, 60, 0.25);
+                box-shadow: 0 0 8px 3px rgba(255, 224, 102, 0.55), 0 0 20px 8px rgba(255, 200, 60, 0.25);
                 transform: translate(-50%, -50%) scale(1);
             }
             50% {
-                box-shadow: 0 0 10px 4px rgba(255, 224, 102, 0.85), 0 0 26px 12px rgba(255, 200, 60, 0.45);
+                box-shadow: 0 0 14px 6px rgba(255, 224, 102, 0.85), 0 0 32px 16px rgba(255, 200, 60, 0.45);
                 transform: translate(-50%, -50%) scale(1.25);
             }
         }
@@ -212,8 +213,8 @@
         @keyframes progressPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.5); } 50% { box-shadow: 0 0 14px 6px rgba(72, 187, 120, 0.4); } }
         @keyframes shimmer { 0% { left: -100%; } 50%, 100% { left: 100%; } }
 
-        .col-drag-over { outline: 2px solid var(--accent); outline-offset: -2px; background: var(--accent) !important; color: white !important; }
-        .col-drag-over span { color: white !important; }
+        .col-drag-over { outline: 2px solid var(--accent); outline-offset: -2px; }
+        .col-dragging { opacity: 1 !important; background: var(--accent) !important; color: #fff !important; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
         .hidden-row { display: none; }
         .mode-newday .lrp-only { display: none !important; }
         .mode-newday #submit2Btn { opacity: 0.55; filter: grayscale(35%); position: relative; }
@@ -695,16 +696,18 @@
             <div class="card">
                 <h3>ℹ️ About</h3>
                 <div class="settings-list">
-                    <div class="settings-row">
-                        <div class="settings-row-left">
+                    <div class="settings-row" style="flex-wrap:wrap;gap:6px 0;">
+                        <div class="settings-row-left" style="width:100%;">
                             <div class="settings-icon">📚</div>
                             <div>
                                 <div class="settings-row-title">In Depth Report Assistant</div>
                                 <div class="settings-row-desc">Version <span id="aboutVersion">—</span></div>
                             </div>
                         </div>
-                        <button class="btn-secondary" onclick="showWhatsNew()" style="flex-shrink:0;">🆕 What's New</button>
-                        <button class="btn-secondary" onclick="checkForTauriUpdate()" style="flex-shrink:0;">🔄 Check for Updates</button>
+                        <div style="display:flex;gap:8px;margin-left:40px;width:100%;justify-content:space-between;">
+                            <button class="btn-secondary" onclick="showWhatsNew()">🆕 What's New</button>
+                            <button class="btn-secondary" onclick="checkForTauriUpdate()" style="flex-shrink:0;">🔄 Check for Updates</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -816,7 +819,7 @@
                 <p>Support and contact information</p>
             </div>
             <div class="help-card">
-                <p>Your feedback is welcome! If you have questions or suggestions, please reach out to the developer via email.</p>
+                <p>Your feedback is welcome! If you have questions or suggestions, please reach out via email.</p>
                 <a href="mailto:rhunt@jhsnl.ca?subject=In Depth Report Assistant Query" class="email-btn">
                     <span class="email-icon">✉️</span>
                     <span>
@@ -1184,10 +1187,11 @@
 
 <script>
 // ── App Info ──────────────────────────────────────────────────
-const APP_VERSION = '1.3.1';
+const APP_VERSION = '1.3.6';
 const CHANGELOG = [
+    'Fixed column reordering bug',
+    'Fixed updater button (was never loaded without bundler)',
     'Fixed column drag-and-drop reordering in Customize Columns',
-    'Locked Notes and Actions columns',
     'Enhanced dashboard with program distribution donut chart',
     'Average days active tracker (referral to end date)',
     'Message board with stale entries, incomplete entries, birthdays, and report countdown',
@@ -1252,7 +1256,7 @@ function checkWelcomeModal() {
     const name = (localStorage.getItem('staffName') || '').trim();
     if (name) return;
     const isNewDay = reportMode === 'newday';
-    const label = isNewDay ? 'your Case Manager Name' : 'your Facilitator Name';
+    const label = isNewDay ? 'Case Manager Name' : 'Facilitator Name';
     const labelEl = document.getElementById('welcomeModalLabel');
     if (labelEl) labelEl.textContent = label;
     document.getElementById('welcomeModalTitle').textContent = 'Welcome!';
@@ -1752,8 +1756,9 @@ const DEFAULT_COLUMNS = ['participant','status','delivery','program','location',
 const LOCKED_COLUMNS = ['notes', 'actions'];
 
 function loadTableColumns() {
-    const saved = localStorage.getItem('lrpTableColumns');
-    if (saved) {
+    const storageKey = 'lrpTableColumns_v' + APP_VERSION;
+    const saved = localStorage.getItem(storageKey) || localStorage.getItem('lrpTableColumns');
+    if (saved && localStorage.getItem(storageKey)) {
         try { tableColumns = JSON.parse(saved); } catch { tableColumns = [...DEFAULT_COLUMNS]; }
     } else {
         tableColumns = [...DEFAULT_COLUMNS];
@@ -1761,7 +1766,7 @@ function loadTableColumns() {
     tableColumns = tableColumns.filter(id => COLUMN_DEFS.some(c => c.id === id) && !LOCKED_COLUMNS.includes(id));
     LOCKED_COLUMNS.forEach(id => { if (!tableColumns.includes(id)) tableColumns.push(id); });
 }
-function saveTableColumns() { localStorage.setItem('lrpTableColumns', JSON.stringify(tableColumns)); }
+function saveTableColumns() { localStorage.setItem('lrpTableColumns_v' + APP_VERSION, JSON.stringify(tableColumns)); }
 
 function getColDef(id) { return COLUMN_DEFS.find(c => c.id === id); }
 
@@ -1824,9 +1829,9 @@ function renderColumnList() {
         </div>`;
     }).join('');
     list.querySelectorAll('.col-drag-item[draggable="true"]').forEach(el => {
-        el.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', el.dataset.colId); el.style.opacity = '0.4'; });
-        el.addEventListener('dragend', e => { el.style.opacity = ''; list.querySelectorAll('.col-drag-over').forEach(x => x.classList.remove('col-drag-over')); });
-        el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('col-drag-over'); });
+        el.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', el.dataset.colId); e.dataTransfer.effectAllowed = 'move'; el.classList.add('col-dragging'); });
+        el.addEventListener('dragend', e => { el.classList.remove('col-dragging'); list.querySelectorAll('.col-drag-over').forEach(x => x.classList.remove('col-drag-over')); });
+        el.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; el.classList.add('col-drag-over'); });
         el.addEventListener('dragleave', e => { el.classList.remove('col-drag-over'); });
         el.addEventListener('drop', e => {
             e.preventDefault();
@@ -1835,11 +1840,11 @@ function renderColumnList() {
             const toId = el.dataset.colId;
             if (fromId === toId || LOCKED_COLUMNS.includes(toId)) return;
             const fromIdx = tableColumns.indexOf(fromId);
-            let toIdx = tableColumns.indexOf(toId);
-            if (fromIdx === -1 || toIdx === -1) return;
+            const origToIdx = tableColumns.indexOf(toId);
+            if (fromIdx === -1 || origToIdx === -1) return;
             tableColumns.splice(fromIdx, 1);
-            toIdx = tableColumns.indexOf(toId);
-            tableColumns.splice(toIdx + (fromIdx < toIdx ? 1 : 0), 0, fromId);
+            const newToIdx = tableColumns.indexOf(toId);
+            tableColumns.splice(newToIdx + (fromIdx < origToIdx ? 1 : 0), 0, fromId);
             saveTableColumns();
             renderTable();
             renderColumnList();
@@ -1984,7 +1989,7 @@ function renderDashboard() {
     const dashMsgs = document.getElementById('dashMessages');
     dashMsgs.innerHTML = `
         <div class="card" style="padding:16px 20px;"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;">Messages</div><div style="display:flex;gap:32px;flex-wrap:wrap;">${msgs.length ? msgs.join('') : '<div style="color:var(--text-faint);font-size:13px;">All clear</div>'}</div></div>
-        <div class="card" style="padding:16px 20px;display:flex;flex-direction:column;justify-content:center;align-items:center;"><div class="stat-icon ${reportColor}" style="width:36px;height:36px;border-radius:9px;font-size:18px;margin-bottom:8px;">📅</div><div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Report Due</div><div style="font-size:26px;font-weight:800;color:var(--text);">${daysUntilReport}<span style="font-size:13px;font-weight:400;color:var(--text-faint);"> days</span></div></div>
+        <div class="card" style="padding:16px 20px;display:flex;flex-direction:column;justify-content:center;align-items:center;"><div class="stat-icon ${reportColor}" style="width:36px;height:36px;border-radius:9px;font-size:18px;margin-bottom:8px;">📅</div><div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">Report Due</div><div style="font-size:26px;font-weight:800;color:var(--text);">${daysUntilReport}<span style="font-size:13px;font-weight:400;color:var(--text-faint);"> days</span></div><div style="font-size:12px;color:var(--text-faint);margin-top:2px;">${endOfMonth.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div></div>
     `;
 
     // ── Program distribution donut ──
@@ -2010,28 +2015,27 @@ function renderDashboard() {
         donutEl.innerHTML = `<div class="dash-donut" style="background:conic-gradient(${gradient});"><div class="dash-donut-hole">${total}</div></div><div class="dash-donut-legend">${legend}</div>`;
     }
 
-    // ── Average days active (referral → end) ──
+    // ── Average days active (referral → end, or referral → today if no end) ──
     const avgDaysEl = document.getElementById('dashAvgDays');
-    const completed = filtered.filter(e => e.referralDate && e.endDate);
-    if (completed.length === 0) {
-        avgDaysEl.innerHTML = '<div style="color:var(--text-faint);font-size:13px;">No completed entries with referral &amp; end dates</div>';
+    const withReferral = filtered.filter(e => e.referralDate);
+    if (withReferral.length === 0) {
+        avgDaysEl.innerHTML = '<div style="color:var(--text-faint);font-size:13px;">No entries with referral dates</div>';
     } else {
-        const daysList = completed.map(e => {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const daysList = withReferral.map(e => {
             const s = new Date(e.referralDate + 'T00:00:00');
-            const en = new Date(e.endDate + 'T00:00:00');
+            const en = e.endDate ? new Date(e.endDate + 'T00:00:00') : today;
             return Math.round((en - s) / 86400000);
         }).filter(d => d >= 0);
         if (daysList.length === 0) {
             avgDaysEl.innerHTML = '<div style="color:var(--text-faint);font-size:13px;">No valid date ranges</div>';
         } else {
             const avg = Math.round(daysList.reduce((a,b) => a+b, 0) / daysList.length);
-            const min = Math.min(...daysList);
-            const max = Math.max(...daysList);
-            const median = (() => { const s = [...daysList].sort((a,b)=>a-b); const mid = Math.floor(s.length/2); return s.length%2 ? s[mid] : Math.round((s[mid-1]+s[mid])/2); })();
             const byProgram = {};
-            completed.forEach(e => {
+            withReferral.forEach(e => {
                 const p = e.program || 'Unknown';
-                const d = Math.round((new Date(e.endDate+'T00:00:00') - new Date(e.referralDate+'T00:00:00')) / 86400000);
+                const en = e.endDate ? new Date(e.endDate+'T00:00:00') : today;
+                const d = Math.round((en - new Date(e.referralDate+'T00:00:00')) / 86400000);
                 if (d >= 0) { if (!byProgram[p]) byProgram[p] = []; byProgram[p].push(d); }
             });
             const progRows = Object.entries(byProgram).map(([name, vals]) => {
@@ -2039,11 +2043,9 @@ function renderDashboard() {
                 return `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid var(--border);"><span style="color:var(--text);">${name}</span><span style="font-weight:700;color:var(--text);">${progAvg} days <span style="color:var(--text-faint);font-weight:400;">(${vals.length})</span></span></div>`;
             }).join('');
             avgDaysEl.innerHTML = `
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
-                    <div style="text-align:center;"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Average</div><div style="font-size:22px;font-weight:800;color:var(--text);">${avg}<span style="font-size:12px;font-weight:400;color:var(--text-faint);">d</span></div></div>
-                    <div style="text-align:center;"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Median</div><div style="font-size:22px;font-weight:800;color:var(--text);">${median}<span style="font-size:12px;font-weight:400;color:var(--text-faint);">d</span></div></div>
-                    <div style="text-align:center;"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Min</div><div style="font-size:22px;font-weight:800;color:var(--stat-green);">${min}<span style="font-size:12px;font-weight:400;color:var(--text-faint);">d</span></div></div>
-                    <div style="text-align:center;"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Max</div><div style="font-size:22px;font-weight:800;color:var(--stat-red);">${max}<span style="font-size:12px;font-weight:400;color:var(--text-faint);">d</span></div></div>
+                <div style="text-align:center;margin-bottom:16px;">
+                    <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Average Days Active</div>
+                    <div style="font-size:28px;font-weight:800;color:var(--text);">${avg}<span style="font-size:14px;font-weight:400;color:var(--text-faint);"> days</span></div>
                 </div>
                 <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">By Program</div>
                 ${progRows}
