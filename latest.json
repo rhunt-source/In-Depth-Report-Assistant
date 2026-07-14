@@ -1,11 +1,11 @@
 {
-  "version": "1.4.0",
-  "notes": "Renamed app to In-Depth, updated logo, tutorial improvements, sidebar branding",
-  "pub_date": "2026-07-14T12:00:00Z",
+  "version": "1.4.1",
+  "notes": "Fixed version display in Settings page",
+  "pub_date": "2026-07-14T14:00:00Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUQ3BMZEZQSUhkYjAzeVVMSDltVWx4TUl6WitpL1RBcWk2ZXBocEtyUDBGRXo1TDdXV252UUF0TFpUejhIcmR6SVdnNGZhN05VTjJwR3NRNXZINWgwSzZ1ZTNZRW4yMWdJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MDQyMjUxCWZpbGU6SW4tRGVwdGhfMS40LjBfeDY0LXNldHVwLmV4ZQp5amsxeXVsTlpwTVFDUkp6ZDlKN1I3ajBGRDNMc1BvMStzdTIvOE00ZkZWRllrWkFOQ0ZOQ2YyazRzL0hMUTlPOVFxTitWRmRyQk90L2I3aHBOTzVCQT09Cg==",
-      "url": "https://github.com/rhunt-source/In-Depth-Report-Assistant/releases/download/v1.4.0/In-Depth_1.4.0_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUQ3BMZEZQSUhkYjVZVmVxYm8vTjM2aEw2bjBlZ0xLVnpxeXlmbkwwWEJUMmpsa0k0ODdPdmVRKzJKM3FxUVNRTDBjZWY5SElwU3JjTzNqRUkyWjZRT3d2OXdWNUJWN3dRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MDQ4MjU2CWZpbGU6SW4tRGVwdGhfMS40LjFfeDY0LXNldHVwLmV4ZQphclFpbWtBWDV0S09KT3N6Tm5scWs4ZGR5ZUh1b2w4eEN4K2xuZm00dUxMeTZHSTRyYXB5SHBVMkhFQkpLZlo5QVNpVXl0K0luV3d2UEtJaGFvUDdDQT09Cg==",
+      "url": "https://github.com/rhunt-source/In-Depth-Report-Assistant/releases/download/v1.4.1/In-Depth_1.4.1_x64-setup.exe"
     }
   }
 }
