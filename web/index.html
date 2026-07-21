@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>In-Depth</title>
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<script src="./lib/pocketbase.umd.js"></script>
 <script src="app.js"></script>
     <style>
         :root {
@@ -369,10 +370,52 @@
             .date-arrow { display: none; }
             #dashCharts { grid-template-columns: 1fr !important; }
         }
+
+        /* ── Login Screen ─────────────────────────────────────── */
+        .login-overlay { position:fixed; inset:0; background:linear-gradient(135deg,#092E42 0%,#1c7289 50%,#018170 100%); z-index:99999; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+        .login-card { background:var(--card-bg); border-radius:16px; padding:40px 36px 32px; max-width:420px; width:90%; box-shadow:0 12px 48px rgba(0,0,0,.35); text-align:center; }
+        .login-logo { width:120px; height:auto; margin:0 auto 20px; display:block; }
+        .login-title { font-size:22px; font-weight:800; color:var(--text); margin-bottom:4px; }
+        .login-subtitle { font-size:13px; color:var(--text-muted); margin-bottom:24px; }
+        .login-field { width:100%; box-sizing:border-box; padding:11px 14px; border:1px solid var(--border); border-radius:8px; font-size:13px; background:var(--input-bg); color:var(--text); outline:none; margin-bottom:14px; }
+        .login-field:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(9,46,66,0.15); }
+        .login-btn { width:100%; padding:12px; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; background:var(--accent); color:#fff; transition:background 0.2s; }
+        .login-btn:hover { background:#0a3d5c; }
+        .login-btn:disabled { opacity:0.5; cursor:not-allowed; }
+        .login-error { font-size:12px; color:#e53e3e; margin-top:8px; min-height:18px; }
+        .login-url-row { text-align:left; margin-bottom:14px; }
+        .login-url-row label { font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; display:block; }
+        .login-url-row input { width:100%; box-sizing:border-box; padding:8px 12px; border:1px solid var(--border); border-radius:6px; font-size:12px; background:var(--bg); color:var(--text); outline:none; }
+        .login-url-row input:focus { border-color:var(--accent); }
+        .login-spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-right:6px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .conn-indicator { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+        .conn-ok { background:#38a169; }
+        .conn-off { background:#d69e2e; }
+        .conn-err { background:#e53e3e; }
     </style>
 
 </head>
 <body>
+
+<!-- Login Screen (shown on load, hidden after auth) -->
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+        <img src="./indepthlogo.png" alt="In-Depth" class="login-logo">
+        <div class="login-title">In-Depth</div>
+        <div class="login-subtitle">Sign in to continue</div>
+        <div id="loginUrlRow" class="login-url-row" style="display:none;">
+            <label>Server URL</label>
+            <input type="url" id="loginUrlInput" placeholder="https://your-server.com" class="login-field" style="margin-bottom:0;">
+        </div>
+        <input type="email" id="loginEmail" placeholder="Email address" class="login-field" autocomplete="email">
+        <input type="password" id="loginPassword" placeholder="Password" class="login-field" autocomplete="current-password"
+            onkeydown="if(event.key==='Enter') pbLogin();">
+        <button id="loginBtn" class="login-btn" onclick="pbLogin()">Sign In</button>
+        <div id="loginError" class="login-error"></div>
+    </div>
+</div>
+
 <div class="app">
     <aside class="sidebar" data-tutorial-section="sidebar">
         <div class="sidebar-logo">
@@ -408,6 +451,10 @@
             </button>
         </nav>
         <div class="sidebar-footer">
+            <div id="connStatus" style="text-align:center;font-size:11px;color:rgba(255,255,255,0.7);margin-bottom:6px;">
+                <span id="connDot" class="conn-indicator conn-off"></span>
+                <span id="connLabel">Connecting...</span>
+            </div>
             <div style="text-align:center;font-family:'Hammersmith One',sans-serif;font-size:8px;color:rgba(255,255,255,0.85);letter-spacing:0.5px;">
                 <div>insight navigation</div>
                 <div style="margin-top:2px;">data entry &</div>
@@ -719,7 +766,17 @@
                         </div>
                         <div style="display:flex;gap:8px;margin-left:40px;width:100%;justify-content:space-between;">
                             <button class="btn-secondary" onclick="showWhatsNew()">🆕 What's New</button>
-                            <button class="btn-secondary" onclick="checkForTauriUpdate()" style="flex-shrink:0;">🔄 Check for Updates</button>
+                            <div style="display:flex;gap:8px;">
+                                <button class="btn-secondary" onclick="checkForTauriUpdate()" style="flex-shrink:0;">🔄 Check for Updates</button>
+                                <button class="btn-danger" onclick="pbLogout()" style="flex-shrink:0;">🚪 Sign Out</button>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;margin-left:40px;width:100%;margin-top:8px;">
+                            <span style="font-size:12px;color:var(--text-muted);white-space:nowrap;">Server URL:</span>
+                            <input type="url" id="settingsUrlInput" placeholder="https://your-server.com"
+                                style="flex:1;min-width:0;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--input-bg);color:var(--text);outline:none;"
+                                onchange="localStorage.setItem('pbUrl', this.value)">
+                            <span id="settingsUrlStatus" style="font-size:11px;color:var(--text-muted);"></span>
                         </div>
                     </div>
                 </div>
@@ -1348,8 +1405,16 @@
 
 <script>
 // ── App Info ──────────────────────────────────────────────────
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.5.0';
 const CHANGELOG = [
+    'PocketBase integration — data now syncs to a central server for multi-facilitator collaboration',
+    'Login screen with email/password authentication',
+    'Real-time sync — see updates from other facilitators instantly',
+    'Connection status indicator in the sidebar footer',
+    'Server URL configurable in Settings',
+    'Sign Out button in Settings',
+    'Entries, archives, and settings stored server-side',
+    'Practice sandbox remains fully offline and isolated',
     'Fixed column reordering bug',
     'Fixed updater button (was never loaded without bundler)',
     'Fixed column drag-and-drop reordering in Customize Columns',
@@ -1378,9 +1443,7 @@ function closeWhatsNew() {
 
 // ── State ─────────────────────────────────────────────────────
 let reportMode = localStorage.getItem('reportMode') || 'lrp';
-function entriesKey() { return reportMode === 'newday' ? 'ndEntries' : 'lrpEntries'; }
-function archivePrefix() { return reportMode === 'newday' ? 'ndArchive_' : 'lrpArchive_'; }
-let entries = JSON.parse(localStorage.getItem(entriesKey())) || [];
+let entries = [];
 let editIndex = -1;
 let staleOnlyFilter = false;
 // Reporting period for Archive/Submit/Email — asked once via a pop-up (not
@@ -1409,6 +1472,8 @@ function applySettings() {
     if (lureToggle) lureToggle.checked = lure;
     const staffNameEl = document.getElementById('staffName');
     if (staffNameEl) staffNameEl.value = localStorage.getItem('staffName') || '';
+    const urlInput = document.getElementById('settingsUrlInput');
+    if (urlInput) urlInput.value = localStorage.getItem('pbUrl') || '';
     renderRecipientEmailList();
 }
 
@@ -1416,16 +1481,11 @@ function applySettings() {
 function checkWelcomeModal() {
     const name = (localStorage.getItem('staffName') || '').trim();
     if (name) return;
-    const isNewDay = reportMode === 'newday';
-    const label = isNewDay ? 'Case Manager Name' : 'Facilitator Name';
-    const labelEl = document.getElementById('welcomeModalLabel');
-    if (labelEl) labelEl.textContent = label;
     document.getElementById('welcomeModalTitle').textContent = 'Welcome!';
-    document.getElementById('welcomeModalFormRow').style.display = '';
-    document.getElementById('welcomeModalDoneRow').style.display = 'none';
-    document.getElementById('welcomeNameInput').value = '';
+    document.getElementById('welcomeModalSubtitle').textContent = 'Would you like a quick tour of the app?';
+    document.getElementById('welcomeModalFormRow').style.display = 'none';
+    document.getElementById('welcomeModalDoneRow').style.display = '';
     document.getElementById('welcomeModal').style.display = 'flex';
-    setTimeout(() => document.getElementById('welcomeNameInput').focus(), 50);
 }
 
 function submitWelcomeName() {
@@ -1527,7 +1587,13 @@ function toggleColorBlindMode(on) {
 function isIPVIC(program) {
     return program === "Safety and Repair (IPVIC)";
 }
-function save() { localStorage.setItem(entriesKey(), JSON.stringify(entries)); }
+async function save() {
+    for (var i = 0; i < entries.length; i++) {
+        var e = entries[i];
+        var result = await pbSaveEntry(e);
+        if (result && result._pbId) e._pbId = result._pbId;
+    }
+}
 
 // ── Report Mode (LRP / New Day) ─────────────────────────────────
 function applyReportModeUI() {
@@ -1552,7 +1618,6 @@ function setReportMode(mode) {
     }
     reportMode = mode;
     localStorage.setItem('reportMode', mode);
-    entries = JSON.parse(localStorage.getItem(entriesKey())) || [];
     editIndex = -1;
     const progFilter = document.getElementById('programFilter');
     if (progFilter) progFilter.selectedIndex = 0;
@@ -1564,9 +1629,12 @@ function setReportMode(mode) {
     if (searchInput) searchInput.value = '';
     applyReportModeUI();
     clearForm();
-    renderTable();
-    renderDashboard();
-    renderArchive();
+    pbLoadEntries(mode).then(function(loaded) {
+        entries = loaded;
+        renderTable();
+        renderDashboard();
+        renderArchive();
+    });
 }
 
 function statusBadgeClass(status) {
@@ -1785,6 +1853,7 @@ function saveEntry() {
         startDate: document.getElementById('startDate').value,
         endDate: document.getElementById('endDate').value,
         notes: (editIndex !== -1 && entries[editIndex] && entries[editIndex].notes) ? entries[editIndex].notes : [],
+        reportMode: reportMode,
     };
     const noteText = document.getElementById('entryNote').value.trim();
     if (noteText) entry.notes.push({ text: noteText, date: new Date().toLocaleString() });
@@ -1827,7 +1896,12 @@ function editEntry(i) {
 }
 
 function deleteEntry(i) {
-    if (confirm('Delete this entry?')) { entries.splice(i, 1); save(); renderTable(); }
+    if (confirm('Delete this entry?')) {
+        var pbId = entries[i]._pbId;
+        entries.splice(i, 1);
+        if (pbId) pbDeleteEntry(pbId);
+        save(); renderTable();
+    }
 }
 
 // ── Notes ─────────────────────────────────────────────────────
@@ -1891,8 +1965,14 @@ function deleteNote(idx) {
     save(); renderNotesList(); renderTable();
 }
 
-function wipeData() {
-    if (confirm('Wipe ALL data? This cannot be undone.')) { entries = []; save(); renderTable(); renderDashboard(); }
+async function wipeData() {
+    if (confirm('Wipe ALL data? This cannot be undone.')) {
+        for (var i = 0; i < entries.length; i++) {
+            if (entries[i]._pbId) await pbDeleteEntry(entries[i]._pbId);
+        }
+        entries = [];
+        save(); renderTable(); renderDashboard();
+    }
 }
 
 // ── Entries table: customizable columns ───────────────────────
@@ -2405,26 +2485,16 @@ function updateReportPeriodIndicator() {
 }
 
 // ── Archive ───────────────────────────────────────────────────
-function archiveCurrentMonth() {
+async function archiveCurrentMonth() {
     if (!entries.length) { alert('No entries to archive.'); return; }
-    requestReportPeriod(period => {
-        const key = archivePrefix() + period;
-        const existing = JSON.parse(localStorage.getItem(key) || 'null');
-        if (existing && !confirm('An archive for ' + formatMonth(period) + ' already exists. Overwrite?')) return;
-        localStorage.setItem(key, JSON.stringify({ month: period, archivedAt: new Date().toISOString(), reportMode, entries }));
+    requestReportPeriod(async period => {
+        const existing = await pbLoadArchives(reportMode);
+        const match = existing.find(a => a.month === period);
+        if (match && !confirm('An archive for ' + formatMonth(period) + ' already exists. Overwrite?')) return;
+        await pbSaveArchive(period, reportMode, JSON.stringify(entries));
         alert('Archived ' + entries.length + ' entr' + (entries.length === 1 ? 'y' : 'ies') + ' for ' + formatMonth(period) + '.');
         renderArchive();
     });
-}
-
-function getArchiveKeys() {
-    const prefix = archivePrefix();
-    const keys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith(prefix)) keys.push(k);
-    }
-    return keys.sort().reverse();
 }
 
 function formatMonth(ym) {
@@ -2433,16 +2503,17 @@ function formatMonth(ym) {
     return new Date(y, m - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
 }
 
-function deleteArchive(key) {
-    if (confirm('Delete the archive for ' + formatMonth(key.replace(archivePrefix(), '')) + '?')) {
-        localStorage.removeItem(key); renderArchive();
+async function deleteArchive(id) {
+    if (confirm('Delete this archive?')) {
+        await pbDeleteArchive(id);
+        renderArchive();
     }
 }
 
-function exportArchive(key) {
-    const record = JSON.parse(localStorage.getItem(key) || 'null');
-    if (!record || !record.entries.length) { alert('No data in this archive.'); return; }
-    const isNewDay = record.reportMode === 'newday';
+function exportArchive(archiveRecord) {
+    if (!archiveRecord || !archiveRecord.entries || !archiveRecord.entries.length) { alert('No data in this archive.'); return; }
+    const entryList = typeof archiveRecord.entries === 'string' ? JSON.parse(archiveRecord.entries) : archiveRecord.entries;
+    const isNewDay = archiveRecord.reportMode === 'newday';
     const staffLabel = isNewDay ? 'Case Manager' : 'Facilitator';
     const exportCols = [
         { label: staffLabel, getValue: e => e.staffName },
@@ -2451,34 +2522,33 @@ function exportArchive(key) {
             return { label: col.label, getValue: e => stripHtml(col.getValue(e, 0, false)) };
         }),
     ];
-    const rows = record.entries.map(e => {
+    const rows = entryList.map(e => {
         const row = {};
         exportCols.forEach(c => row[c.label] = c.getValue(e));
         return row;
     });
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Archive');
-    XLSX.writeFile(wb, (isNewDay ? 'NewDay_Archive_' : 'LRP_Archive_') + record.month + '.xlsx');
+    XLSX.writeFile(wb, (isNewDay ? 'NewDay_Archive_' : 'LRP_Archive_') + archiveRecord.month + '.xlsx');
 }
 
-function toggleArchiveCard(key) {
-    document.getElementById('abody_' + key)?.classList.toggle('open');
-    document.getElementById('achev_' + key)?.classList.toggle('open');
+function toggleArchiveCard(id) {
+    document.getElementById('abody_' + id)?.classList.toggle('open');
+    document.getElementById('achev_' + id)?.classList.toggle('open');
 }
 
-function renderArchive() {
-    const keys = getArchiveKeys();
+async function renderArchive() {
     const container = document.getElementById('archiveList');
     if (!container) return;
-    if (!keys.length) { container.innerHTML = "<div class='archive-empty'>No archived reports yet.</div>"; return; }
-    container.innerHTML = keys.map(key => {
-        const record = JSON.parse(localStorage.getItem(key) || 'null');
-        if (!record) return '';
+    const archives = await pbLoadArchives(reportMode);
+    if (!archives.length) { container.innerHTML = "<div class='archive-empty'>No archived reports yet.</div>"; return; }
+    container.innerHTML = archives.map(record => {
+        const entryList = typeof record.entries === 'string' ? JSON.parse(record.entries) : record.entries;
         const isNewDay = record.reportMode === 'newday';
         const label = formatMonth(record.month);
-        const archivedAt = record.archivedAt ? new Date(record.archivedAt).toLocaleString() : '—';
-        const count = record.entries.length;
-        const rows = record.entries.map(e => `<tr>
+        const archivedAt = record.created ? new Date(record.created).toLocaleString() : '—';
+        const count = entryList.length;
+        const rows = entryList.map(e => `<tr>
             <td><b>${e.participantName||'—'}</b></td>
             ${isNewDay ? '' : `<td>${e.program||'—'}</td>`}
             <td>${e.location||'—'}</td>
@@ -2486,7 +2556,7 @@ function renderArchive() {
             ${isNewDay ? '' : `<td>${e.deliveryType||'—'}</td>`}
         </tr>`).join('');
         return `<div class="archive-card">
-            <div class="archive-card-header" onclick="toggleArchiveCard('${key}')">
+            <div class="archive-card-header" onclick="toggleArchiveCard('${record.id}')">
                 <div class="archive-card-header-left">
                     <div class="archive-month-icon">📁</div>
                     <div>
@@ -2495,12 +2565,12 @@ function renderArchive() {
                     </div>
                 </div>
                 <div class="archive-card-actions">
-                    <button class="btn-primary" style="padding:6px 12px;font-size:12px;background:#32B9A3;" onclick="event.stopPropagation();exportArchive('${key}')">⬇ Export</button>
-                    <button class="btn-danger" style="padding:6px 12px;font-size:12px" onclick="event.stopPropagation();deleteArchive('${key}')">🗑 Delete</button>
-                    <span class="archive-chevron" id="achev_${key}">▼</span>
+                    <button class="btn-primary" style="padding:6px 12px;font-size:12px;background:#32B9A3;" onclick="event.stopPropagation();exportArchive(${JSON.stringify(record).replace(/"/g, '&quot;')})">⬇ Export</button>
+                    <button class="btn-danger" style="padding:6px 12px;font-size:12px" onclick="event.stopPropagation();deleteArchive('${record.id}')">🗑 Delete</button>
+                    <span class="archive-chevron" id="achev_${record.id}">▼</span>
                 </div>
             </div>
-            <div class="archive-card-body" id="abody_${key}">
+            <div class="archive-card-body" id="abody_${record.id}">
                 <div class="archive-snap-bar"><span>Snapshot of <strong>${label}</strong> — read-only</span></div>
                 <table>
                     <thead><tr>
@@ -3480,20 +3550,123 @@ function deleteUpload(id) {
     renderProgramBoxSummary();
 }
 
+// ── localStorage → PocketBase Migration ─────────────────────────
+async function migrateLocalStorage() {
+    if (localStorage.getItem('pbMigrated_v1_5')) return;
+    var migrated = 0;
+
+    // Migrate LRP entries
+    var lrpEntries = JSON.parse(localStorage.getItem('lrpEntries') || '[]');
+    for (var i = 0; i < lrpEntries.length; i++) {
+        var e = lrpEntries[i];
+        e.reportMode = 'lrp';
+        await pbSaveEntry(e);
+        migrated++;
+    }
+
+    // Migrate New Day entries
+    var ndEntries = JSON.parse(localStorage.getItem('ndEntries') || '[]');
+    for (var i = 0; i < ndEntries.length; i++) {
+        var e = ndEntries[i];
+        e.reportMode = 'newday';
+        await pbSaveEntry(e);
+        migrated++;
+    }
+
+    // Migrate archives (scan localStorage for lrpArchive_* and ndArchive_* keys)
+    for (var j = 0; j < localStorage.length; j++) {
+        var key = localStorage.key(j);
+        if (!key) continue;
+        if (key.indexOf('lrpArchive_') === 0 || key.indexOf('ndArchive_') === 0) {
+            try {
+                var archive = JSON.parse(localStorage.getItem(key));
+                var mode = key.indexOf('lrpArchive_') === 0 ? 'lrp' : 'newday';
+                var month = key.replace('lrpArchive_', '').replace('ndArchive_', '');
+                var entriesJson = JSON.stringify(archive.entries || archive);
+                await pbSaveArchive(month, mode, entriesJson);
+            } catch (e) {
+                console.error('Migration archive failed:', key, e);
+            }
+        }
+    }
+
+    // Migrate settings
+    var darkMode = localStorage.getItem('lrpDarkMode') === '1';
+    var colorBlindMode = localStorage.getItem('lrpColorBlindMode') === '1';
+    var lureGlow = localStorage.getItem('lrpLureGlow') === '1';
+    var recipientEmails = localStorage.getItem('lrpSubmissionEmails') || '';
+    var tableColumns = localStorage.getItem('lrpTableColumns_v' + APP_VERSION) || '';
+    await pbSaveSettings({
+        darkMode: darkMode,
+        colorBlindMode: colorBlindMode,
+        lureGlow: lureGlow,
+        recipientEmails: recipientEmails,
+        tableColumns: tableColumns,
+    });
+
+    localStorage.setItem('pbMigrated_v1_5', '1');
+    if (migrated > 0) {
+        showToast('Migrated ' + migrated + ' entries from local storage');
+    }
+}
+
 // ── Init ──────────────────────────────────────────────────────
-document.getElementById('aboutVersion').textContent = APP_VERSION;
-applyReportModeUI();
-applySettings();
-loadTableColumns();
-checkWelcomeModal();
-renderDashboard();
-renderTable();
-renderArchive();
-updateDateLocks();
-renderRelStats();
-renderQuarterlyReport();
-renderProgramBoxSummary();
-renderUploadList();
+async function initApp() {
+    document.getElementById('aboutVersion').textContent = APP_VERSION;
+    applyReportModeUI();
+    applySettings();
+    loadTableColumns();
+    await migrateLocalStorage();
+    entries = await pbLoadEntries(reportMode);
+    renderDashboard();
+    renderTable();
+    renderArchive();
+    updateDateLocks();
+    renderRelStats();
+    renderQuarterlyReport();
+    renderProgramBoxSummary();
+    renderUploadList();
+    checkWelcomeModal();
+    pbSubscribeEntries(function(action, record) {
+        record._pbId = record.id;
+        if (action === 'create') {
+            if (!entries.find(function(e) { return e._pbId === record.id; })) {
+                entries.push(record);
+            }
+        } else if (action === 'update') {
+            var idx = entries.findIndex(function(e) { return e._pbId === record.id; });
+            if (idx !== -1) entries[idx] = record;
+        } else if (action === 'delete') {
+            entries = entries.filter(function(e) { return e._pbId !== record.id; });
+        }
+        renderTable();
+        renderDashboard();
+        showToast('Data updated by another facilitator');
+    });
+}
+
+// Auto-load: check if already authenticated
+(function() {
+    var url = getPbUrl();
+    if (url && pb && pb.authStore.isValid) {
+        initApp();
+    } else if (url) {
+        initPocketBase(url);
+        if (pb && pb.authStore.isValid) {
+            pb.collection('users').authRefresh().then(function() {
+                initApp();
+            }).catch(function() {
+                showLoginScreen();
+            });
+        } else {
+            showLoginScreen();
+        }
+    } else {
+        document.getElementById('aboutVersion').textContent = APP_VERSION;
+        applySettings();
+        showLoginScreen();
+    }
+})();
 
 // ── Practice Sandbox (fully isolated) ──────────────────────────
 let practiceEntries = [
