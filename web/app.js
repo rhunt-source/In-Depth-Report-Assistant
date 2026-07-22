@@ -166,7 +166,7 @@ var PB_URL_DEFAULT = 'https://in-depth.ca';
 var pb = null;
 
 function getPbUrl() {
-    return localStorage.getItem('pbUrl') || PB_URL_DEFAULT;
+    return PB_URL_DEFAULT;
 }
 
 function initPocketBase(url) {
@@ -203,10 +203,8 @@ async function pbLogin() {
     }
 
     var urlInput = document.getElementById('loginUrlInput');
-    var url = (urlInput && urlInput.value.trim()) || getPbUrl();
-    if (urlInput && urlInput.value.trim()) {
-        localStorage.setItem('pbUrl', urlInput.value.trim());
-    }
+    var url = PB_URL_DEFAULT;
+    localStorage.removeItem('pbUrl');
     if (!url) {
         errorEl.textContent = 'Please enter a server URL.';
         var urlRow = document.getElementById('loginUrlRow');
@@ -255,9 +253,8 @@ function showLoginScreen() {
     var urlRow = document.getElementById('loginUrlRow');
     var urlInput = document.getElementById('loginUrlInput');
     if (urlRow && urlInput) {
-        var url = localStorage.getItem('pbUrl') || '';
-        urlInput.value = url;
-        urlRow.style.display = url ? 'none' : '';
+        urlInput.value = PB_URL_DEFAULT;
+        urlRow.style.display = 'none';
         if (!url) setTimeout(function() { urlInput.focus(); }, 100);
     }
 }
