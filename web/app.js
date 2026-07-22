@@ -108,7 +108,7 @@ if (document.readyState === 'loading') {
 // ==========================================
 // POCKETBASE INIT + AUTH
 // ==========================================
-var PB_URL_DEFAULT = 'http://34.24.66.107';
+var PB_URL_DEFAULT = 'https://in-depth.ca';
 var pb = null;
 
 function getPbUrl() {
@@ -383,6 +383,61 @@ async function pbSaveSettings(settings) {
     } catch (e) {
         console.error('Failed to save settings:', e);
         return null;
+    }
+}
+
+// ==========================================
+// POCKETBASE USER MANAGEMENT (admin only)
+// ==========================================
+
+function isAdmin() {
+    return pb && pb.authStore.isValid && pb.authStore.record && pb.authStore.record.isAdmin === true;
+}
+
+async function pbListUsers() {
+    if (!pb || !pb.authStore.isValid || !isAdmin()) return [];
+    try {
+        return await pb.collection('users').getFullList({ sort: 'created' });
+    } catch (e) {
+        console.error('Failed to list users:', e);
+        return [];
+    }
+}
+
+async function pbCreateUser(email, password, name) {
+    if (!pb || !pb.authStore.isValid || !isAdmin()) return null;
+    try {
+        return await pb.collection('users').create({
+            email: email,
+            password: password,
+            passwordConfirm: password,
+            name: name,
+            isAdmin: false,
+        });
+    } catch (e) {
+        console.error('Failed to create user:', e);
+        throw e;
+    }
+}
+
+async function pbDeleteUser(userId) {
+    if (!pb || !pb.authStore.isValid || !isAdmin() || !userId) return false;
+    try {
+        await pb.collection('users').delete(userId);
+        return true;
+    } catch (e) {
+        console.error('Failed to delete user:', e);
+        return false;
+    }
+}
+
+async function pbUpdateUser(userId, data) {
+    if (!pb || !pb.authStore.isValid || !isAdmin() || !userId) return null;
+    try {
+        return await pb.collection('users').update(userId, data);
+    } catch (e) {
+        console.error('Failed to update user:', e);
+        throw e;
     }
 }
 

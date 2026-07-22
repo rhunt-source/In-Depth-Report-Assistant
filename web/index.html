@@ -781,6 +781,17 @@
                     </div>
                 </div>
             </div>
+            <div class="card" id="adminUserMgmt" style="display:none;">
+                <h3>👥 User Management</h3>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Create and manage facilitator accounts. Only admins can access this section.</p>
+                <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+                    <input type="email" id="newUserEmail" placeholder="Email address" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--input-bg);color:var(--text);">
+                    <input type="password" id="newUserPassword" placeholder="Password" style="flex:1;min-width:150px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--input-bg);color:var(--text);">
+                    <input type="text" id="newUserName" placeholder="Full name" style="flex:1;min-width:150px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--input-bg);color:var(--text);">
+                    <button class="btn-primary" onclick="adminCreateUser()" style="white-space:nowrap;">➕ Add User</button>
+                </div>
+                <div id="adminUserList" style="font-size:13px;"></div>
+            </div>
             <div class="card">
                 <h3>📋 Report Settings</h3>
                 <div class="settings-list">
@@ -1456,6 +1467,47 @@ let adminFilesLoaded = 0;
 let adminFilesFailed = 0;
 const ADMIN_PASSWORD = 'St@ts342';
 
+// ── Admin User Management ──────────────────────────────────────
+async function renderAdminUserList() {
+    var el = document.getElementById('adminUserList');
+    if (!el) return;
+    var users = await pbListUsers();
+    if (!users.length) { el.innerHTML = '<p style="color:var(--text-faint);">No users found.</p>'; return; }
+    el.innerHTML = users.map(function(u) {
+        var isCurrent = pb.authStore.record && pb.authStore.record.id === u.id;
+        var adminBadge = u.isAdmin ? ' <span style="background:var(--badge-blue-bg);color:var(--badge-blue-text);padding:1px 6px;border-radius:4px;font-size:11px;">Admin</span>' : '';
+        var deleteBtn = isCurrent ? '' : '<button class="btn-danger" style="padding:2px 8px;font-size:11px;margin-left:8px;" onclick="adminDeleteUser(\'' + u.id + '\', \'' + escapeHtml(u.email) + '\')">Remove</button>';
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">' +
+            '<div><strong>' + escapeHtml(u.name || u.email) + '</strong>' + adminBadge + '<br><span style="font-size:11px;color:var(--text-faint);">' + escapeHtml(u.email) + '</span></div>' +
+            '<div>' + deleteBtn + '</div></div>';
+    }).join('');
+}
+
+async function adminCreateUser() {
+    var email = (document.getElementById('newUserEmail').value || '').trim();
+    var password = document.getElementById('newUserPassword').value || '';
+    var name = (document.getElementById('newUserName').value || '').trim();
+    if (!email || !password) { alert('Email and password are required.'); return; }
+    try {
+        await pbCreateUser(email, password, name);
+        document.getElementById('newUserEmail').value = '';
+        document.getElementById('newUserPassword').value = '';
+        document.getElementById('newUserName').value = '';
+        renderAdminUserList();
+        showToast('User created: ' + email);
+    } catch (e) {
+        var msg = (e && e.response && e.response.message) || 'Failed to create user.';
+        alert(msg);
+    }
+}
+
+async function adminDeleteUser(userId, email) {
+    if (!confirm('Remove user ' + email + '?')) return;
+    await pbDeleteUser(userId);
+    renderAdminUserList();
+    showToast('User removed: ' + email);
+}
+
 // ── Settings (Dark Mode / Color Blind Mode) ─────────────────────
 function applySettings() {
     const dark = localStorage.getItem('lrpDarkMode') === '1';
@@ -1694,7 +1746,7 @@ function showPage(name, event) {
     if (name === 'dashboard') renderDashboard();
     if (name === 'entries') { renderTable(); }
     if (name === 'archive') renderArchive();
-    if (name === 'settings') { applySettings(); applyReportModeUI(); }
+    if (name === 'settings') { applySettings(); applyReportModeUI(); var adminCard = document.getElementById('adminUserMgmt'); if (adminCard) { if (isAdmin()) { adminCard.style.display = ''; renderAdminUserList(); } else { adminCard.style.display = 'none'; } } }
     if (name === 'practice') { p_loadTableColumns(); p_renderTable(); p_updateDateLocks(); }
     // Admin: just show the page, lock screen handles itself
 }
