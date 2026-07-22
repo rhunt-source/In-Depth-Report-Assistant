@@ -175,8 +175,12 @@ async function pbLogin() {
         if (typeof initApp === 'function') await initApp();
     } catch (e) {
         console.error('Login failed:', e);
-        var msg = (e && e.response && e.response.message) || 'Login failed. Check your credentials and server connection.';
-        errorEl.textContent = msg;
+        var detail = '';
+        if (e && e.response && e.response.message) detail = e.response.message;
+        else if (e && e.message) detail = e.message;
+        else if (e && e.originalError) detail = String(e.originalError);
+        else detail = String(e);
+        errorEl.textContent = 'Login failed: ' + detail;
     } finally {
         btn.disabled = false;
         btn.textContent = 'Sign In';
