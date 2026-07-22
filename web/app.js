@@ -3,6 +3,60 @@
 // Uses window.__TAURI__ globals injected by Tauri runtime.
 // ==========================================
 
+// Intercept PocketBase fetch calls through Rust backend
+// (workaround for WebView2 SSL issues on corporate networks)
+(function() {
+    var _origFetch = window.fetch;
+    var PB_HOST = 'in-depth.ca';
+    window.fetch = async function(url, opts) {
+        var urlStr = (typeof url === 'string') ? url : (url && url.url) || '';
+        if (urlStr.indexOf(PB_HOST) !== -1 && window.__TAURI__ && window.__TAURI__.core) {
+            try {
+                var headers = {};
+                if (opts && opts.headers) {
+                    if (opts.headers instanceof Headers) {
+                        opts.headers.forEach(function(v, k) { headers[k] = v; });
+                    } else if (typeof opts.headers === 'object') {
+                        for (var k in opts.headers) headers[k] = opts.headers[k];
+                    }
+                }
+                var body = null;
+                if (opts && opts.body) {
+                    if (typeof opts.body === 'string') body = opts.body;
+                    else if (opts.body instanceof URLSearchParams) body = opts.body.toString();
+                    else if (typeof FormData !== 'undefined' && opts.body instanceof FormData) {
+                        var obj = {};
+                        opts.body.forEach(function(v, k) { obj[k] = v; });
+                        body = JSON.stringify(obj);
+                        if (!headers['Content-Type']) headers['Content-Type'] = 'application/json';
+                    }
+                }
+                var result = await window.__TAURI__.core.invoke('pb_fetch', {
+                    request: {
+                        url: urlStr,
+                        method: (opts && opts.method) || 'GET',
+                        headers: headers,
+                        body: body
+                    }
+                });
+                var respHeaders = new Headers();
+                if (result.headers) {
+                    for (var hk in result.headers) respHeaders.set(hk, result.headers[hk]);
+                }
+                return new Response(result.body, {
+                    status: result.status,
+                    statusText: result.status_text,
+                    headers: respHeaders
+                });
+            } catch (e) {
+                console.error('[PB] Rust fetch proxy failed:', e);
+                throw e;
+            }
+        }
+        return _origFetch.apply(this, arguments);
+    };
+})();
+
 // ==========================================
 // SUBMIT REPORT (needs Tauri FS)
 // ==========================================
