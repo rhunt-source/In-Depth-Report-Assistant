@@ -3700,6 +3700,7 @@ async function initApp() {
 // Auto-load: check if already authenticated
 (function() {
     var url = getPbUrl();
+    console.log('[PB] Connecting to:', url, '| localStorage pbUrl:', localStorage.getItem('pbUrl'));
     if (url && pb && pb.authStore.isValid) {
         initApp();
     } else if (url) {
@@ -3718,15 +3719,18 @@ async function initApp() {
         applySettings();
         showLoginScreen();
     }
-    // Test connectivity on load
+    // Show URL on login screen and test connectivity
+    var urlRow = document.getElementById('loginUrlRow');
+    var urlInput = document.getElementById('loginUrlInput');
+    if (urlRow && urlInput) { urlRow.style.display = ''; urlInput.value = url || ''; }
     fetch(url + '/api/health').then(function(r) { return r.json(); }).then(function(d) {
         console.log('[PB] Health check OK:', d);
         var el = document.getElementById('loginError');
         if (el && !el.textContent) el.textContent = '';
     }).catch(function(e) {
-        console.error('[PB] Health check FAILED:', e);
+        console.error('[PB] Health check FAILED:', e.message, 'URL:', url);
         var el = document.getElementById('loginError');
-        if (el) el.textContent = 'Cannot reach server: ' + e.message;
+        if (el) el.textContent = 'Cannot reach server (' + url + '): ' + e.message;
     });
 })();
 
