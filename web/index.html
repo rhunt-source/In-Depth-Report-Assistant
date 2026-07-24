@@ -395,44 +395,53 @@
         .conn-err { background:#e53e3e; }
         .profile-field-label { font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px; }
         .profile-field-value { font-size:13px; color:var(--text); font-weight:500; }
-        .profile-timeline-container { display:flex; flex-direction:column; gap:0; }
-        .profile-timeline-card {
-            display:flex; align-items:center; gap:16px; padding:14px 18px;
-            background:var(--card-bg); border:1px solid var(--border); border-radius:12px;
-            position:relative; opacity:0; transform:translateX(-30px);
-            animation:timelineSlideIn 0.4s ease forwards;
+        .profile-timeline { display:flex; align-items:center; position:relative; padding:8px 0; }
+        .profile-timeline-track {
+            position:absolute; top:12px; left:12px; right:12px; height:3px;
+            background:var(--border); border-radius:2px; overflow:hidden;
         }
-        .profile-timeline-card:nth-child(1) { animation-delay:0s; }
-        .profile-timeline-card:nth-child(2) { animation-delay:0.12s; }
-        .profile-timeline-card:nth-child(3) { animation-delay:0.24s; }
-        .profile-timeline-card:nth-child(4) { animation-delay:0.36s; }
-        @keyframes timelineSlideIn {
-            to { opacity:1; transform:translateX(0); }
+        .profile-timeline-track-fill {
+            height:100%; width:0%; background:linear-gradient(90deg,#1c7289,#32B9A3);
+            border-radius:2px; transition:width 0.6s ease;
         }
-        .profile-timeline-card.filled { border-left:3px solid #1c7289; }
-        .profile-timeline-card.empty { border-left:3px solid var(--border); opacity:0; transform:translateX(-30px); animation:timelineSlideInEmpty 0.4s ease forwards; }
-        @keyframes timelineSlideInEmpty {
-            to { opacity:0.55; transform:translateX(0); }
+        .profile-timeline-step {
+            flex:1; display:flex; flex-direction:column; align-items:center;
+            position:relative; z-index:2;
         }
-        .profile-timeline-icon {
-            width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-            flex-shrink:0; font-size:16px; transition:transform 0.2s;
+        .profile-timeline-dot {
+            width:26px; height:26px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700;
+            background:var(--card-bg); border:3px solid var(--border); color:var(--text-muted);
+            transition:border-color 0.4s, background 0.4s, color 0.4s, box-shadow 0.4s;
+            animation:ptDotAppear 0.35s ease backwards;
         }
-        .profile-timeline-card:hover .profile-timeline-icon { transform:scale(1.1); }
-        .profile-timeline-icon.filled { background:rgba(28,114,137,0.12); color:#1c7289; }
-        .profile-timeline-icon.empty { background:var(--bg-alt); color:var(--text-muted); }
-        .profile-timeline-info { flex:1; }
-        .profile-timeline-label { font-size:12px; font-weight:600; color:var(--text); text-transform:uppercase; letter-spacing:0.04em; }
-        .profile-timeline-date { font-size:13px; color:var(--text-muted); margin-top:2px; }
-        .profile-timeline-connector {
-            width:2px; height:16px; margin-left:35px;
-            background:linear-gradient(to bottom, var(--border), transparent);
-            opacity:0; animation:connectorFade 0.3s ease forwards;
+        .profile-timeline-step:nth-child(1) .profile-timeline-dot { animation-delay:0.05s; }
+        .profile-timeline-step:nth-child(2) .profile-timeline-dot { animation-delay:0.15s; }
+        .profile-timeline-step:nth-child(3) .profile-timeline-dot { animation-delay:0.25s; }
+        .profile-timeline-step:nth-child(4) .profile-timeline-dot { animation-delay:0.35s; }
+        @keyframes ptDotAppear {
+            0% { transform:scale(0); opacity:0; }
+            70% { transform:scale(1.15); }
+            100% { transform:scale(1); opacity:1; }
         }
-        .profile-timeline-connector:nth-child(2) { animation-delay:0.06s; }
-        .profile-timeline-connector:nth-child(4) { animation-delay:0.18s; }
-        .profile-timeline-connector:nth-child(6) { animation-delay:0.30s; }
-        @keyframes connectorFade { to { opacity:0.6; } }
+        .profile-timeline-dot.filled {
+            background:#1c7289; border-color:#32B9A3; color:#fff;
+        }
+        .profile-timeline-dot.filled.last-filled {
+            animation:ptPulse 2s ease-in-out infinite;
+        }
+        @keyframes ptPulse {
+            0%,100% { box-shadow:0 0 0 0 rgba(50,185,163,0.4); }
+            50% { box-shadow:0 0 0 8px rgba(50,185,163,0); }
+        }
+        .profile-timeline-dot:hover { transform:scale(1.1); }
+        .profile-timeline-info { text-align:center; margin-top:10px; }
+        .profile-timeline-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); transition:color 0.4s; }
+        .profile-timeline-dot.filled ~ .profile-timeline-info .profile-timeline-label { color:var(--text); }
+        .profile-timeline-date { font-size:12px; color:var(--text-muted); margin-top:2px; transition:color 0.4s; }
+        .profile-timeline-dot.filled ~ .profile-timeline-info .profile-timeline-date { color:var(--text-muted); }
+        .profile-timeline-status { font-size:10px; margin-top:2px; font-weight:500; }
         .profile-note-card { border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:8px; }
         .profile-note-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
         .profile-note-category { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; padding:2px 8px; border-radius:4px; display:inline-block; }
@@ -2207,20 +2216,26 @@ function renderProfile() {
     if (editBtn) editBtn.style.display = '';
 
     var steps = [
-        { label: 'Referral', date: e.referralDate, icon: '📩' },
-        { label: 'Assessment', date: e.assessmentDate, icon: '📋' },
-        { label: 'Start', date: e.startDate, icon: '🚀' },
-        { label: 'End', date: e.endDate, icon: '✅' }
+        { label: 'Referral', date: e.referralDate },
+        { label: 'Assessment', date: e.assessmentDate },
+        { label: 'Start', date: e.startDate },
+        { label: 'End', date: e.endDate }
     ];
-    var timeHTML = '<div class="profile-timeline-container">';
+    var lastFilledIdx = -1;
+    steps.forEach(function(s, i) { if (s.date) lastFilledIdx = i; });
+    var filledCount = steps.filter(function(s) { return s.date; }).length;
+    var pct = steps.length <= 1 ? 0 : (filledCount === 0 ? 0 : (lastFilledIdx / (steps.length - 1)) * 100);
+
+    var timeHTML = '<div class="profile-timeline"><div class="profile-timeline-track"><div class="profile-timeline-track-fill" style="width:' + pct + '%"></div></div>';
     steps.forEach(function(s, idx) {
-        if (idx > 0) timeHTML += '<div class="profile-timeline-connector"></div>';
         var filled = !!s.date;
-        timeHTML += '<div class="profile-timeline-card ' + (filled ? 'filled' : 'empty') + '">' +
-            '<div class="profile-timeline-icon ' + (filled ? 'filled' : 'empty') + '">' + (filled ? '✓' : s.icon) + '</div>' +
+        var isLast = (idx === lastFilledIdx);
+        timeHTML += '<div class="profile-timeline-step">' +
+            '<div class="profile-timeline-dot' + (filled ? ' filled' : '') + (isLast ? ' last-filled' : '') + '">' + (filled ? '✓' : (idx + 1)) + '</div>' +
             '<div class="profile-timeline-info">' +
             '<div class="profile-timeline-label">' + s.label + '</div>' +
             '<div class="profile-timeline-date">' + (s.date || 'Pending') + '</div>' +
+            '<div class="profile-timeline-status" style="color:' + (filled ? '#32B9A3' : 'var(--text-muted)') + '">' + (filled ? 'Completed' : 'Pending') + '</div>' +
             '</div></div>';
     });
     timeHTML += '</div>';
@@ -2525,20 +2540,26 @@ function renderSearchProfile() {
     if (editBtn2) editBtn2.style.display = 'none';
 
     var steps = [
-        { label: 'Referral', date: e.referralDate, icon: '📩' },
-        { label: 'Assessment', date: e.assessmentDate, icon: '📋' },
-        { label: 'Start', date: e.startDate, icon: '🚀' },
-        { label: 'End', date: e.endDate, icon: '✅' }
+        { label: 'Referral', date: e.referralDate },
+        { label: 'Assessment', date: e.assessmentDate },
+        { label: 'Start', date: e.startDate },
+        { label: 'End', date: e.endDate }
     ];
-    var timeHTML = '<div class="profile-timeline-container">';
+    var lastFilledIdx2 = -1;
+    steps.forEach(function(s, i) { if (s.date) lastFilledIdx2 = i; });
+    var filledCount2 = steps.filter(function(s) { return s.date; }).length;
+    var pct2 = steps.length <= 1 ? 0 : (filledCount2 === 0 ? 0 : (lastFilledIdx2 / (steps.length - 1)) * 100);
+
+    var timeHTML = '<div class="profile-timeline"><div class="profile-timeline-track"><div class="profile-timeline-track-fill" style="width:' + pct2 + '%"></div></div>';
     steps.forEach(function(s, idx) {
-        if (idx > 0) timeHTML += '<div class="profile-timeline-connector"></div>';
         var filled = !!s.date;
-        timeHTML += '<div class="profile-timeline-card ' + (filled ? 'filled' : 'empty') + '">' +
-            '<div class="profile-timeline-icon ' + (filled ? 'filled' : 'empty') + '">' + (filled ? '✓' : s.icon) + '</div>' +
+        var isLast = (idx === lastFilledIdx2);
+        timeHTML += '<div class="profile-timeline-step">' +
+            '<div class="profile-timeline-dot' + (filled ? ' filled' : '') + (isLast ? ' last-filled' : '') + '">' + (filled ? '✓' : (idx + 1)) + '</div>' +
             '<div class="profile-timeline-info">' +
             '<div class="profile-timeline-label">' + s.label + '</div>' +
             '<div class="profile-timeline-date">' + (s.date || 'Pending') + '</div>' +
+            '<div class="profile-timeline-status" style="color:' + (filled ? '#32B9A3' : 'var(--text-muted)') + '">' + (filled ? 'Completed' : 'Pending') + '</div>' +
             '</div></div>';
     });
     timeHTML += '</div>';
