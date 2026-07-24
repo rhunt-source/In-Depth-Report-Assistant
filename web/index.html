@@ -536,22 +536,6 @@
                     <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Racial Identity</label><select id="race"><option value=""></option><option>White</option><option>Black</option><option>Indigenous</option><option>South Asian</option><option>East or Southeast Asian</option><option>Middle Eastern or North African</option><option>Latin American</option><option>Other</option><option>Prefer not to say</option></select></div>
                     <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Disability Disclosure</label><select id="disabilityDisclosure"><option value=""></option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
                 </div>
-                <div class="form-section-title">Contact</div>
-                <div style="display:flex;gap:14px;margin-bottom:8px;">
-                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Phone</label><input type="tel" id="phone" placeholder="Phone number"></div>
-                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Email</label><input type="email" id="email" placeholder="Email address"></div>
-                </div>
-                <div style="display:flex;gap:14px;margin-bottom:16px;">
-                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Address</label><input type="text" id="address" placeholder="Street address, city"></div>
-                </div>
-                <div class="form-section-title">Emergency Contact</div>
-                <div style="display:flex;gap:14px;margin-bottom:8px;">
-                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Emergency Contact Name</label><input type="text" id="emergencyName" placeholder="Full name"></div>
-                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Emergency Contact Phone</label><input type="tel" id="emergencyPhone" placeholder="Phone number"></div>
-                </div>
-                <div style="display:flex;gap:14px;margin-bottom:16px;">
-                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Relationship</label><input type="text" id="emergencyRelationship" placeholder="e.g. Spouse, Parent, Sibling"></div>
-                </div>
                 <div class="form-section-title">Referral</div>
                 <div class="form-grid">
                     <div class="form-group"><label>Referral Source</label><input type="text" id="referralSource" placeholder="Enter referral source"></div>
@@ -642,12 +626,18 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
                 <div class="card" style="padding:20px;">
-                    <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;">Contact</h3>
-                    <div id="profileContact" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                        <h3 style="font-size:14px;font-weight:700;color:var(--text);">Contact</h3>
+                        <button id="contactEditBtn" class="btn-secondary" onclick="toggleProfileEdit('contact')" style="padding:4px 12px;font-size:12px;">✏️ Edit</button>
+                    </div>
+                    <div id="profileContact"></div>
                 </div>
                 <div class="card" style="padding:20px;">
-                    <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;">Emergency Contact</h3>
-                    <div id="profileEmergency" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                        <h3 style="font-size:14px;font-weight:700;color:var(--text);">Emergency Contact</h3>
+                        <button id="emergencyEditBtn" class="btn-secondary" onclick="toggleProfileEdit('emergency')" style="padding:4px 12px;font-size:12px;">✏️ Edit</button>
+                    </div>
+                    <div id="profileEmergency"></div>
                 </div>
             </div>
             <div class="card" style="padding:20px;margin-bottom:20px;">
@@ -657,7 +647,7 @@
             <div class="card" style="padding:20px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
                     <h3 style="font-size:14px;font-weight:700;color:var(--text);">Session Notes <span id="profileNoteCount" style="font-weight:400;color:var(--text-muted);font-size:12px;"></span></h3>
-                    <button class="btn-secondary" onclick="editEntryFromProfile()" style="padding:5px 12px;font-size:12px;">Edit Entry</button>
+                    <button id="profileEditEntryBtn" class="btn-secondary" onclick="editEntryFromProfile()" style="padding:5px 12px;font-size:12px;">Edit Entry</button>
                 </div>
                 <div id="profileNotesList" style="margin-bottom:16px;"></div>
                 <div style="border-top:1px solid var(--border);padding-top:14px;">
@@ -2004,8 +1994,6 @@ function saveEntry() {
     const entry = {
         staffName,
         participantName, dob: document.getElementById('dob').value, race: document.getElementById('race').value, disabilityDisclosure: document.getElementById('disabilityDisclosure').value, gender: document.getElementById('gender').value, referralSource: document.getElementById('referralSource').value,
-        phone: document.getElementById('phone').value, email: document.getElementById('email').value, address: document.getElementById('address').value,
-        emergencyName: document.getElementById('emergencyName').value, emergencyPhone: document.getElementById('emergencyPhone').value, emergencyRelationship: document.getElementById('emergencyRelationship').value,
         referralAgency: document.getElementById('referralAgency').value, program,
         region: (reportMode !== 'newday' && isIPVIC(program)) ? document.getElementById('region').value : '',
         riskLevel: (reportMode !== 'newday' && isIPVIC(program)) ? document.getElementById('riskLevel').value : 'N/A',
@@ -2037,12 +2025,6 @@ function editEntry(i) {
     document.getElementById('disabilityDisclosure').value = e.disabilityDisclosure || '';
     document.getElementById('gender').value = e.gender || '';
     document.getElementById('referralSource').value = e.referralSource || '';
-    document.getElementById('phone').value = e.phone || '';
-    document.getElementById('email').value = e.email || '';
-    document.getElementById('address').value = e.address || '';
-    document.getElementById('emergencyName').value = e.emergencyName || '';
-    document.getElementById('emergencyPhone').value = e.emergencyPhone || '';
-    document.getElementById('emergencyRelationship').value = e.emergencyRelationship || '';
     document.getElementById('referralAgency').value = e.referralAgency || '';
     document.getElementById('program').value = e.program || '';
     document.getElementById('region').value = e.region || '';
@@ -2186,15 +2168,12 @@ function renderProfile() {
     progHTML += profileField('Staff', e.staffName);
     document.getElementById('profileProgram').innerHTML = progHTML;
 
-    var contactHTML = profileField('Phone', e.phone);
-    contactHTML += profileField('Email', e.email);
-    contactHTML += profileField('Address', e.address);
-    document.getElementById('profileContact').innerHTML = contactHTML;
-
-    var emergHTML = profileField('Name', e.emergencyName);
-    emergHTML += profileField('Phone', e.emergencyPhone);
-    emergHTML += profileField('Relationship', e.emergencyRelationship);
-    document.getElementById('profileEmergency').innerHTML = emergHTML;
+    renderProfileContactFields(e);
+    renderProfileEmergencyFields(e);
+    resetProfileEditMode('contact');
+    resetProfileEditMode('emergency');
+    var editBtn = document.getElementById('profileEditEntryBtn');
+    if (editBtn) editBtn.style.display = '';
 
     var steps = [
         { label: 'Referral', date: e.referralDate },
@@ -2221,6 +2200,126 @@ function renderProfile() {
 
 function profileField(label, value) {
     return '<div><div class="profile-field-label">' + label + '</div><div class="profile-field-value">' + (value || '—') + '</div></div>';
+}
+
+function renderProfileContactFields(e) {
+    document.getElementById('profileContact').innerHTML =
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
+        profileField('Phone', e.phone) + profileField('Email', e.email) + profileField('Address', e.address) +
+        '</div>';
+}
+
+function renderProfileEmergencyFields(e) {
+    document.getElementById('profileEmergency').innerHTML =
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
+        profileField('Name', e.emergencyName) + profileField('Phone', e.emergencyPhone) + profileField('Relationship', e.emergencyRelationship) +
+        '</div>';
+}
+
+function renderProfileContactEdit(e) {
+    document.getElementById('profileContact').innerHTML =
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
+        '<div><div class="profile-field-label">Phone</div><input type="tel" id="profileEditPhone" value="' + escapeHtml(e.phone || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--input-bg);color:var(--text);box-sizing:border-box;"></div>' +
+        '<div><div class="profile-field-label">Email</div><input type="email" id="profileEditEmail" value="' + escapeHtml(e.email || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--input-bg);color:var(--text);box-sizing:border-box;"></div>' +
+        '<div style="grid-column:1/-1;"><div class="profile-field-label">Address</div><input type="text" id="profileEditAddress" value="' + escapeHtml(e.address || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--input-bg);color:var(--text);box-sizing:border-box;"></div>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">' +
+        '<button class="btn-secondary" onclick="cancelProfileEdit(\'contact\')" style="padding:5px 14px;font-size:12px;">Cancel</button>' +
+        '<button class="btn-primary" onclick="saveProfileEdit(\'contact\')" style="padding:5px 14px;font-size:12px;background:#1c7289;">Save</button>' +
+        '</div>';
+}
+
+function renderProfileEmergencyEdit(e) {
+    document.getElementById('profileEmergency').innerHTML =
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
+        '<div style="grid-column:1/-1;"><div class="profile-field-label">Name</div><input type="text" id="profileEditEmergName" value="' + escapeHtml(e.emergencyName || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--input-bg);color:var(--text);box-sizing:border-box;"></div>' +
+        '<div><div class="profile-field-label">Phone</div><input type="tel" id="profileEditEmergPhone" value="' + escapeHtml(e.emergencyPhone || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--input-bg);color:var(--text);box-sizing:border-box;"></div>' +
+        '<div><div class="profile-field-label">Relationship</div><input type="text" id="profileEditEmergRelationship" value="' + escapeHtml(e.emergencyRelationship || '') + '" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--input-bg);color:var(--text);box-sizing:border-box;"></div>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">' +
+        '<button class="btn-secondary" onclick="cancelProfileEdit(\'emergency\')" style="padding:5px 14px;font-size:12px;">Cancel</button>' +
+        '<button class="btn-primary" onclick="saveProfileEdit(\'emergency\')" style="padding:5px 14px;font-size:12px;background:#1c7289;">Save</button>' +
+        '</div>';
+}
+
+function toggleProfileEdit(section) {
+    var e;
+    if (profileEntryIndex >= 0 && profileEntryIndex < entries.length) {
+        e = entries[profileEntryIndex];
+    } else if (searchProfileRecord) {
+        e = searchProfileRecord;
+    }
+    if (!e) return;
+    if (section === 'contact') {
+        renderProfileContactEdit(e);
+        document.getElementById('contactEditBtn').textContent = '✕ Cancel';
+        document.getElementById('contactEditBtn').onclick = function() { cancelProfileEdit('contact'); };
+    } else {
+        renderProfileEmergencyEdit(e);
+        document.getElementById('emergencyEditBtn').textContent = '✕ Cancel';
+        document.getElementById('emergencyEditBtn').onclick = function() { cancelProfileEdit('emergency'); };
+    }
+}
+
+function cancelProfileEdit(section) {
+    var e;
+    if (profileEntryIndex >= 0 && profileEntryIndex < entries.length) {
+        e = entries[profileEntryIndex];
+    } else if (searchProfileRecord) {
+        e = searchProfileRecord;
+    }
+    if (!e) return;
+    if (section === 'contact') {
+        renderProfileContactFields(e);
+        document.getElementById('contactEditBtn').textContent = '✏️ Edit';
+        document.getElementById('contactEditBtn').onclick = function() { toggleProfileEdit('contact'); };
+    } else {
+        renderProfileEmergencyFields(e);
+        document.getElementById('emergencyEditBtn').textContent = '✏️ Edit';
+        document.getElementById('emergencyEditBtn').onclick = function() { toggleProfileEdit('emergency'); };
+    }
+}
+
+function resetProfileEditMode(section) {
+    var btn = document.getElementById(section === 'contact' ? 'contactEditBtn' : 'emergencyEditBtn');
+    if (btn) {
+        btn.style.display = '';
+        btn.textContent = '✏️ Edit';
+        btn.onclick = function() { toggleProfileEdit(section); };
+    }
+}
+
+async function saveProfileEdit(section) {
+    var e;
+    var idx = -1;
+    if (profileEntryIndex >= 0 && profileEntryIndex < entries.length) {
+        e = entries[profileEntryIndex];
+        idx = profileEntryIndex;
+    } else if (searchProfileRecord) {
+        e = searchProfileRecord;
+    }
+    if (!e) return;
+    if (section === 'contact') {
+        e.phone = document.getElementById('profileEditPhone').value.trim();
+        e.email = document.getElementById('profileEditEmail').value.trim();
+        e.address = document.getElementById('profileEditAddress').value.trim();
+    } else {
+        e.emergencyName = document.getElementById('profileEditEmergName').value.trim();
+        e.emergencyPhone = document.getElementById('profileEditEmergPhone').value.trim();
+        e.emergencyRelationship = document.getElementById('profileEditEmergRelationship').value.trim();
+    }
+    if (e._pbId) await pbSaveEntry(e);
+    if (idx >= 0) { save(); renderTable(); }
+    if (section === 'contact') {
+        renderProfileContactFields(e);
+        document.getElementById('contactEditBtn').textContent = '✏️ Edit';
+        document.getElementById('contactEditBtn').onclick = function() { toggleProfileEdit('contact'); };
+    } else {
+        renderProfileEmergencyFields(e);
+        document.getElementById('emergencyEditBtn').textContent = '✏️ Edit';
+        document.getElementById('emergencyEditBtn').onclick = function() { toggleProfileEdit('emergency'); };
+    }
+    showToast('Saved');
 }
 
 function renderProfileNotes() {
@@ -2384,15 +2483,12 @@ function renderSearchProfile() {
     progHTML += profileField('Staff', e.staffName);
     document.getElementById('profileProgram').innerHTML = progHTML;
 
-    var contactHTML = profileField('Phone', e.phone);
-    contactHTML += profileField('Email', e.email);
-    contactHTML += profileField('Address', e.address);
-    document.getElementById('profileContact').innerHTML = contactHTML;
-
-    var emergHTML = profileField('Name', e.emergencyName);
-    emergHTML += profileField('Phone', e.emergencyPhone);
-    emergHTML += profileField('Relationship', e.emergencyRelationship);
-    document.getElementById('profileEmergency').innerHTML = emergHTML;
+    renderProfileContactFields(e);
+    renderProfileEmergencyFields(e);
+    document.getElementById('contactEditBtn').style.display = 'none';
+    document.getElementById('emergencyEditBtn').style.display = 'none';
+    var editBtn2 = document.getElementById('profileEditEntryBtn');
+    if (editBtn2) editBtn2.style.display = 'none';
 
     var steps = [
         { label: 'Referral', date: e.referralDate },
