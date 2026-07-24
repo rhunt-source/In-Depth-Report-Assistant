@@ -393,6 +393,28 @@
         .conn-ok { background:#38a169; }
         .conn-off { background:#d69e2e; }
         .conn-err { background:#e53e3e; }
+        .profile-field-label { font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px; }
+        .profile-field-value { font-size:13px; color:var(--text); font-weight:500; }
+        .profile-timeline-step { text-align:center; min-width:120px; }
+        .profile-timeline-dot { width:12px; height:12px; border-radius:50%; margin:0 auto 6px; }
+        .profile-timeline-dot.filled { background:#1c7289; }
+        .profile-timeline-dot.empty { background:var(--border); }
+        .profile-timeline-date { font-size:11px; color:var(--text-muted); }
+        .profile-timeline-label { font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px; }
+        .profile-timeline-connector { flex:1; height:2px; background:var(--border); align-self:center; margin-top:-18px; }
+        .profile-note-card { border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:8px; }
+        .profile-note-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+        .profile-note-category { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; padding:2px 8px; border-radius:4px; display:inline-block; }
+        .cat-session { background:#ebf8ff; color:#2b6cb0; }
+        .cat-phone { background:#f0fff4; color:#276749; }
+        .cat-email { background:#faf5ff; color:#6b46c1; }
+        .cat-incident { background:#fff5f5; color:#c53030; }
+        .cat-progress { background:#fffff0; color:#975a16; }
+        .cat-referral { background:#e6fffa; color:#285e61; }
+        .cat-other { background:var(--bg); color:var(--text-muted); }
+        .participant-link { color:#1c7289; cursor:pointer; text-decoration:none; }
+        .participant-link:hover { text-decoration:underline; }
+        @media (max-width:800px) { #page-profile > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; } }
     </style>
 
 </head>
@@ -579,6 +601,53 @@
             <div class="table-wrap">
                 <table><thead id="tableHead"><tr></tr></thead><tbody id="tableBody"></tbody></table>
                 <div id="emptyState" class="empty" style="display:none"><p>No entries found. Add your first entry above.</p></div>
+            </div>
+        </div>
+
+        <!-- PROFILE PAGE -->
+        <div id="page-profile" class="page">
+            <div class="page-header" style="display:flex;align-items:center;gap:12px;">
+                <button class="btn-secondary" onclick="showPage('entries', null)" style="padding:6px 12px;font-size:12px;">← Back</button>
+                <div><h1 id="profileName">Participant Profile</h1><p id="profileSubtitle">Details and notes</p></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+                <div class="card" style="padding:20px;">
+                    <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;">Participant Information</h3>
+                    <div id="profileInfo" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+                </div>
+                <div class="card" style="padding:20px;">
+                    <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;">Program & Status</h3>
+                    <div id="profileProgram" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+                </div>
+            </div>
+            <div class="card" style="padding:20px;margin-bottom:20px;">
+                <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;">Timeline</h3>
+                <div id="profileTimeline" style="display:flex;gap:16px;flex-wrap:wrap;"></div>
+            </div>
+            <div class="card" style="padding:20px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                    <h3 style="font-size:14px;font-weight:700;color:var(--text);">Session Notes <span id="profileNoteCount" style="font-weight:400;color:var(--text-muted);font-size:12px;"></span></h3>
+                    <button class="btn-secondary" onclick="editEntryFromProfile()" style="padding:5px 12px;font-size:12px;">Edit Entry</button>
+                </div>
+                <div id="profileNotesList" style="margin-bottom:16px;"></div>
+                <div style="border-top:1px solid var(--border);padding-top:14px;">
+                    <div style="display:flex;gap:10px;margin-bottom:8px;">
+                        <select id="profileNoteCategory" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--input-bg);color:var(--text);">
+                            <option value="Session Note">Session Note</option>
+                            <option value="Phone Call">Phone Call</option>
+                            <option value="Email">Email</option>
+                            <option value="Incident">Incident</option>
+                            <option value="Progress Update">Progress Update</option>
+                            <option value="Referral">Referral</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span style="font-size:12px;color:var(--text-muted);align-self:center;" id="profileNoteStaff"></span>
+                    </div>
+                    <textarea id="profileNoteText" rows="3" placeholder="Add a session note..." style="width:100%;resize:vertical;border-radius:8px;border:1px solid var(--border);padding:8px 10px;font-family:inherit;font-size:13px;box-sizing:border-box;"></textarea>
+                    <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+                        <button class="btn-primary" onclick="addProfileNote()" style="background:#1c7289;">Add Note</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2027,9 +2096,135 @@ async function wipeData() {
     }
 }
 
+// ── Profile Page ────────────────────────────────────────────────
+let profileEntryIndex = -1;
+
+function openProfile(i) {
+    profileEntryIndex = i;
+    renderProfile();
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-profile').classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    var entriesBtn = document.querySelector('[onclick*="showPage(\'entries\'"]');
+    if (entriesBtn) entriesBtn.classList.add('active');
+}
+
+function renderProfile() {
+    if (profileEntryIndex < 0 || profileEntryIndex >= entries.length) return;
+    var e = entries[profileEntryIndex];
+    document.getElementById('profileName').textContent = e.participantName || 'Unknown Participant';
+    document.getElementById('profileSubtitle').textContent = (e.program || '') + (e.status ? ' — ' + e.status : '');
+
+    var infoHTML = profileField('Name', e.participantName);
+    infoHTML += profileField('Date of Birth', e.dob);
+    infoHTML += profileField('Gender', e.gender);
+    infoHTML += profileField('Racial Identity', e.race);
+    infoHTML += profileField('Disability', e.disabilityDisclosure);
+    infoHTML += profileField('Location', e.location);
+    document.getElementById('profileInfo').innerHTML = infoHTML;
+
+    var progHTML = profileField('Program', e.program);
+    progHTML += profileField('Status', '<span class="badge ' + statusBadgeClass(e.status) + '">' + (e.status || '—') + '</span>');
+    progHTML += profileField('Delivery', e.deliveryType);
+    progHTML += profileField('Region', e.region);
+    progHTML += profileField('Risk Level', e.riskLevel);
+    progHTML += profileField('Days Active', e.daysActive);
+    progHTML += profileField('Referral Source', e.referralSource);
+    progHTML += profileField('Agency', e.referralAgency);
+    progHTML += profileField('Staff', e.staffName);
+    document.getElementById('profileProgram').innerHTML = progHTML;
+
+    var steps = [
+        { label: 'Referral', date: e.referralDate },
+        { label: 'Assessment', date: e.assessmentDate },
+        { label: 'Start', date: e.startDate },
+        { label: 'End', date: e.endDate }
+    ];
+    var timeHTML = '';
+    steps.forEach(function(s, idx) {
+        if (idx > 0) timeHTML += '<div class="profile-timeline-connector"></div>';
+        var filled = !!s.date;
+        timeHTML += '<div class="profile-timeline-step">' +
+            '<div class="profile-timeline-label">' + s.label + '</div>' +
+            '<div class="profile-timeline-dot ' + (filled ? 'filled' : 'empty') + '"></div>' +
+            '<div class="profile-timeline-date">' + (s.date || '—') + '</div></div>';
+    });
+    document.getElementById('profileTimeline').innerHTML = timeHTML;
+
+    var staffName = localStorage.getItem('staffName') || '';
+    document.getElementById('profileNoteStaff').textContent = staffName ? 'Posting as: ' + staffName : '';
+
+    renderProfileNotes();
+}
+
+function profileField(label, value) {
+    return '<div><div class="profile-field-label">' + label + '</div><div class="profile-field-value">' + (value || '—') + '</div></div>';
+}
+
+function renderProfileNotes() {
+    if (profileEntryIndex < 0 || profileEntryIndex >= entries.length) return;
+    var e = entries[profileEntryIndex];
+    var notes = e.notes || [];
+    document.getElementById('profileNoteCount').textContent = '(' + notes.length + ')';
+    var listEl = document.getElementById('profileNotesList');
+    if (notes.length === 0) {
+        listEl.innerHTML = '<p style="font-size:12px;color:var(--text-faint);text-align:center;padding:20px 0;">No notes yet. Add a session note below.</p>';
+        return;
+    }
+    listEl.innerHTML = notes.slice().reverse().map(function(n, ri) {
+        var idx = notes.length - 1 - ri;
+        var catClass = 'cat-other';
+        var cat = (n.category || 'Other').toLowerCase().replace(/\s+/g, '');
+        if (cat === 'sessionnote') catClass = 'cat-session';
+        else if (cat === 'phonecall') catClass = 'cat-phone';
+        else if (cat === 'email') catClass = 'cat-email';
+        else if (cat === 'incident') catClass = 'cat-incident';
+        else if (cat === 'progressupdate') catClass = 'cat-progress';
+        else if (cat === 'referral') catClass = 'cat-referral';
+        return '<div class="profile-note-card">' +
+            '<div class="profile-note-header">' +
+            '<div><span class="profile-note-category ' + catClass + '">' + escapeHtml(n.category || 'Note') + '</span> ' +
+            '<span style="font-size:11px;color:var(--text-faint);margin-left:8px;">' + escapeHtml(n.date || '') + '</span>' +
+            (n.staff ? '<span style="font-size:11px;color:var(--text-faint);margin-left:8px;">by ' + escapeHtml(n.staff) + '</span>' : '') +
+            '</div>' +
+            '<button class="btn-danger" style="padding:2px 8px;font-size:11px;" onclick="deleteProfileNote(' + idx + ')">✕</button>' +
+            '</div>' +
+            '<div style="font-size:13px;color:var(--text);white-space:pre-wrap;margin-top:4px;">' + escapeHtml(n.text || '') + '</div>' +
+            '</div>';
+    }).join('');
+}
+
+function addProfileNote() {
+    if (profileEntryIndex < 0 || profileEntryIndex >= entries.length) return;
+    var textEl = document.getElementById('profileNoteText');
+    var text = textEl.value.trim();
+    if (!text) return;
+    var category = document.getElementById('profileNoteCategory').value;
+    var staff = localStorage.getItem('staffName') || '';
+    var e = entries[profileEntryIndex];
+    if (!e.notes) e.notes = [];
+    e.notes.push({ text: text, date: new Date().toLocaleString(), category: category, staff: staff });
+    textEl.value = '';
+    save(); renderProfileNotes(); renderTable();
+}
+
+function deleteProfileNote(idx) {
+    if (profileEntryIndex < 0 || profileEntryIndex >= entries.length) return;
+    var e = entries[profileEntryIndex];
+    if (!e.notes) return;
+    e.notes.splice(idx, 1);
+    save(); renderProfileNotes(); renderTable();
+}
+
+function editEntryFromProfile() {
+    if (profileEntryIndex < 0 || profileEntryIndex >= entries.length) return;
+    showPage('entries', null);
+    editEntry(profileEntryIndex);
+}
+
 // ── Entries table: customizable columns ───────────────────────
 const COLUMN_DEFS = [
-    { id: 'participant',  label: 'Participant',           cssClass: '',                  getValue: (e) => `<b>${e.participantName||'—'}</b>` },
+    { id: 'participant',  label: 'Participant',           cssClass: '',                  getValue: (e, i) => `<a class="participant-link" onclick="openProfile(${i})" style="cursor:pointer"><b>${e.participantName||'—'}</b></a>` },
     { id: 'dob',         label: 'Date of Birth',         cssClass: 'col-dob',           getValue: (e) => e.dob || '—' },
     { id: 'race',        label: 'Racial Identity',       cssClass: 'col-race',          getValue: (e) => e.race || '—' },
     { id: 'risk',        label: 'Risk',                  cssClass: 'col-risk',          getValue: (e) => e.riskLevel || '—' },
