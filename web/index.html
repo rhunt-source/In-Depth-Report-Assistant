@@ -600,7 +600,7 @@
                 <div class="progress-container"><div id="progressBar" class="progress-fill"></div></div>
                 <div class="form-section-title">Status & Delivery</div>
                 <div class="form-grid">
-                    <div class="form-group"><label>Status</label><select id="status" onchange="toggleConditionalFields()"><option value=""></option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Disengaged</option><option>Complete</option></select></div>
+                    <div class="form-group"><label>Status</label><select id="status" onchange="toggleConditionalFields()"><option value=""></option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Discharged</option><option>Complete</option></select></div>
                     <div class="form-group"><label>Location</label><select id="location"><option value=""></option><option>Community</option><option>HMP</option><option>Virtual</option><option>Other</option></select></div>
                     <div class="form-group lrp-only" id="daysActiveGroup" style="display:none;"><label>Days Active</label><input type="text" id="daysActive" readonly placeholder="—"></div>
                     <div class="form-group lrp-only" id="deliveryTypeGroup"><label>Delivery Type</label><select id="deliveryType"><option value=""></option><option>Individual</option><option>Group</option></select></div>
@@ -631,7 +631,8 @@
                 <div class="form-group" style="flex:2 1 220px"><label>Search</label><input type="text" id="searchInput" placeholder="Search by name, phone, staff..." oninput="renderTable()"></div>
                 <div class="form-group lrp-only"><label>Filter Program</label><select id="programFilter" onchange="renderTable()"><option value="">All Programs</option><option>Anger Solutions</option><option>CBA</option><option>Clinical Counselling</option><option>Dads</option><option>DBT</option><option>IDA</option><option>Maintenance</option><option>PAR</option><option>Safety and Repair</option><option>Safety and Repair (IPVIC)</option><option>Seeking Safety</option><option>STABLE</option></select></div>
                 <div class="form-group"><label>Filter Location</label><select id="locationFilter" onchange="renderTable()"><option value="">All Locations</option><option>Community</option><option>HMP</option><option>Virtual</option><option>Other</option></select></div>
-                <div class="form-group"><label>Filter Status</label><select id="statusFilter" onchange="renderTable()"><option value="">All Statuses</option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Disengaged</option><option>Complete</option></select></div>
+                <div class="form-group"><label>Filter Status</label><select id="statusFilter" onchange="renderTable()"><option value="">All Statuses</option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Discharged</option><option>Complete</option></select></div>
+                <div class="form-group lrp-only"><label>Filter Delivery</label><select id="deliveryFilter" onchange="renderTable()"><option value="">All Delivery</option><option>Individual</option><option>Group</option></select></div>
             </div>
             <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
                 <button class="btn-secondary" onclick="toggleColumnPanel()">⚙️ Customize Columns</button>
@@ -812,7 +813,7 @@
                                     <th style="background:var(--grp-track-light);border-right:2px solid var(--grp-sep);">Referral Withdrawn</th>
                                     <th style="background:var(--grp-outcome-light);">On Hold</th>
                                     <th style="background:var(--grp-outcome-light);">Ongoing</th>
-                                    <th style="background:var(--grp-outcome-light);">Disengaged</th>
+                                    <th style="background:var(--grp-outcome-light);">Discharged</th>
                                     <th style="background:var(--grp-outcome-light);">Complete</th>
                                     <th style="background:var(--grp-outcome-light);">Other</th>
                                     <th style="background:var(--grp-outcome-light);">Total</th>
@@ -865,7 +866,7 @@
                                 <option value="Referral Withdrawn">Referral Withdrawn</option>
                                 <option value="On Hold">On Hold</option>
                                 <option value="Ongoing">Ongoing</option>
-                                <option value="Disengaged">Disengaged</option>
+                                <option value="Discharged">Discharged</option>
                                 <option value="Complete">Complete</option>
                             </select>
                         </div>
@@ -1334,7 +1335,7 @@
                 <div class="progress-container"><div id="p_progressBar" class="progress-fill"></div></div>
                 <div class="form-section-title" data-tutorial-section="status">Status & Delivery</div>
                 <div class="form-grid" data-tutorial-section="status">
-                    <div class="form-group"><label>Status</label><select id="p_status" onchange="p_toggleConditionalFields()"><option value=""></option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Disengaged</option><option>Complete</option></select></div>
+                    <div class="form-group"><label>Status</label><select id="p_status" onchange="p_toggleConditionalFields()"><option value=""></option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Discharged</option><option>Complete</option></select></div>
                     <div class="form-group"><label>Location</label><select id="p_location"><option value=""></option><option>Community</option><option>HMP</option><option>Virtual</option><option>Other</option></select></div>
                     <div class="form-group" id="p_daysActiveGroup" style="display:none;"><label>Days Active</label><input type="text" id="p_daysActive" readonly placeholder="—"></div>
                     <div class="form-group" id="p_deliveryTypeGroup"><label>Delivery Type</label><select id="p_deliveryType"><option value=""></option><option>Individual</option><option>Group</option></select></div>
@@ -1361,7 +1362,7 @@
                 <div class="form-group" style="flex:2 1 220px"><label>Search</label><input type="text" id="p_searchInput" placeholder="Search by participant..." oninput="p_renderTable()"></div>
                 <div class="form-group"><label>Filter Program</label><select id="p_programFilter" onchange="p_renderTable()"><option value="">All Programs</option><option>Anger Solutions</option><option>CBA</option><option>Clinical Counselling</option><option>Dads</option><option>DBT</option><option>IDA</option><option>Maintenance</option><option>PAR</option><option>Safety and Repair</option><option>Safety and Repair (IPVIC)</option><option>Seeking Safety</option><option>STABLE</option></select></div>
                 <div class="form-group"><label>Filter Location</label><select id="p_locationFilter" onchange="p_renderTable()"><option value="">All Locations</option><option>Community</option><option>HMP</option><option>Virtual</option><option>Other</option></select></div>
-                <div class="form-group"><label>Filter Status</label><select id="p_statusFilter" onchange="p_renderTable()"><option value="">All Statuses</option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Disengaged</option><option>Complete</option></select></div>
+                <div class="form-group"><label>Filter Status</label><select id="p_statusFilter" onchange="p_renderTable()"><option value="">All Statuses</option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Discharged</option><option>Complete</option></select></div>
             </div>
             <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
                 <button class="btn-secondary" onclick="p_toggleColumnPanel()">⚙️ Customize Columns</button>
@@ -1835,7 +1836,7 @@ function statusBadgeClass(status) {
     if (!status) return 'badge-grey';
     if (status === 'Complete') return 'badge-green';
     if (status === 'Ongoing') return 'badge-blue';
-    if (status === 'Disengaged' || status === 'Referral Withdrawn') return 'badge-red';
+    if (status === 'Discharged' || status === 'Referral Withdrawn') return 'badge-red';
     return 'badge-amber';
 }
 
@@ -1907,7 +1908,7 @@ function toggleConditionalFields() {
     document.getElementById('daysActiveGroup').style.display = clinical ? '' : 'none';
     document.getElementById('deliveryTypeGroup').style.display = clinical ? 'none' : '';
     const status = document.getElementById('status').value;
-    const reportCompletedRelevant = status === 'Complete' || status === 'Disengaged';
+    const reportCompletedRelevant = status === 'Complete' || status === 'Discharged';
     document.getElementById('reportCompletedGroup').style.display = (!clinical && reportCompletedRelevant) ? '' : 'none';
     if (clinical) updateDaysActive();
 }
@@ -2041,7 +2042,7 @@ function saveEntry() {
         location: document.getElementById('location').value,
         daysActive: (reportMode !== 'newday' && isClinicalCounselling(program)) ? document.getElementById('daysActive').value : '',
         deliveryType: reportMode === 'newday' ? '' : document.getElementById('deliveryType').value,
-        reportCompleted: (reportMode === 'newday' || !(document.getElementById('status').value === 'Complete' || document.getElementById('status').value === 'Disengaged')) ? '' : document.getElementById('reportCompleted').value,
+        reportCompleted: (reportMode === 'newday' || !(document.getElementById('status').value === 'Complete' || document.getElementById('status').value === 'Discharged')) ? '' : document.getElementById('reportCompleted').value,
         referralDate: document.getElementById('referralDate').value,
         assessmentDate: document.getElementById('assessmentDate').value,
         startDate: document.getElementById('startDate').value,
@@ -2667,9 +2668,10 @@ function renderTable() {
     const progFilter = document.getElementById('programFilter')?.value || '';
     const locFilter = document.getElementById('locationFilter')?.value || '';
     const statFilter = document.getElementById('statusFilter')?.value || '';
+    const delFilter = document.getElementById('deliveryFilter')?.value || '';
     const filtered = entries.filter(e => {
         const matchQ = !q || (e.participantName || '').toLowerCase().includes(q) || (e.phone || '').toLowerCase().includes(q) || (e.email || '').toLowerCase().includes(q) || (e.staffName || '').toLowerCase().includes(q) || (e.address || '').toLowerCase().includes(q);
-        return matchQ && (!progFilter || e.program === progFilter) && (!locFilter || e.location === locFilter) && (!statFilter || e.status === statFilter) && (!staleOnlyFilter || isStaleEntry(e));
+        return matchQ && (!progFilter || e.program === progFilter) && (!locFilter || e.location === locFilter) && (!statFilter || e.status === statFilter) && (!delFilter || e.deliveryType === delFilter) && (!staleOnlyFilter || isStaleEntry(e));
     });
     const body = document.getElementById('tableBody');
     const empty = document.getElementById('emptyState');
@@ -2746,7 +2748,7 @@ function toggleColumnVisibility(id, show) {
 }
 
 // ── Stale completed/disengaged entries ───────────────────────
-// An entry is "stale" if it's marked Complete/Disengaged and its End Date was
+// An entry is "stale" if it's marked Complete/Discharged and its End Date was
 // 30+ days ago. Entries are no longer tagged with a fixed report month, so
 // End Date is the only signal we use — an entry with no End Date on file
 // can't be evaluated and is simply not flagged (a good reason to make sure
@@ -2763,7 +2765,7 @@ function staleDaysFor(e) {
     return daysSinceDate(e.endDate);
 }
 function isStaleEntry(e) {
-    if (e.status !== 'Complete' && e.status !== 'Disengaged') return false;
+    if (e.status !== 'Complete' && e.status !== 'Discharged') return false;
     const days = staleDaysFor(e);
     return days !== null && days >= STALE_DAYS_THRESHOLD;
 }
@@ -2783,7 +2785,7 @@ function updateStaleBanner() {
     banner.classList.add('visible');
     document.getElementById('staleBannerText').textContent =
         staleEntries.length + ' entr' + (staleEntries.length === 1 ? 'y has' : 'ies have') +
-        ' been Complete/Disengaged for ' + STALE_DAYS_THRESHOLD + '+ days — review and archive or update ' +
+        ' been Complete/Discharged for ' + STALE_DAYS_THRESHOLD + '+ days — review and archive or update ' +
         (staleEntries.length === 1 ? 'it' : 'them') + '.';
     btn.textContent = staleOnlyFilter ? 'Show all entries' : 'Show only these';
 }
@@ -2816,7 +2818,7 @@ function renderDashboard() {
     if (dashPeriod === 'month') {
         // Entries are no longer tied to a fixed report month, so "Active Now"
         // shows the current live caseload — everything that isn't flagged
-        // stale (Complete/Disengaged for 30+ days) — instead of a calendar filter.
+        // stale (Complete/Discharged for 30+ days) — instead of a calendar filter.
         filtered = entries.filter(e => !isStaleEntry(e));
         subtitle = 'Current active caseload';
     } else if (dashPeriod === 'thisMonth') {
@@ -3681,7 +3683,7 @@ const STATUS_TYPES = [
     'Referral Withdrawn',
     'On Hold',
     'Ongoing',
-    'Disengaged',
+    'Discharged',
     'Complete'
 ];
 let relParticipants  = JSON.parse(localStorage.getItem('lrpRelParticipants'))  || [];
@@ -3901,7 +3903,7 @@ function getQuarterlyReport(fromDate, toDate) {
                 referral_date: enrollment.referral_date || '',
                 assessment_date: getStatusDate('Awaiting Intake Assessment') || getStatusDate('Intake Completed - Not Accepted') || getStatusDate('Intake Completed - Awaiting Program Start') || getStatusDate('Awaiting Program Start'),
                 start_date: getStatusDate('Awaiting Program Start') || getStatusDate('Ongoing') || getStatusDate('On Hold'),
-                end_date: getStatusDate('Complete') || getStatusDate('Disengaged') || getStatusDate('Referral Withdrawn'),
+                end_date: getStatusDate('Complete') || getStatusDate('Discharged') || getStatusDate('Referral Withdrawn'),
                 status: latest.status,
                 effective_date: latest.effective_date,
                 source_file: latest.source_file || ''
@@ -4033,7 +4035,7 @@ function renderProgramBoxSummary() {
     if (boxes.length === 0) { body.innerHTML = ''; if (empty) empty.style.display = ''; const vb = document.getElementById('varianceBanner'); if (vb) vb.classList.remove('visible'); return; }
     if (empty) empty.style.display = 'none';
     const trackParts = ['Awaiting Intake Assessment','Referral Withdrawn'];
-    const outcomeParts = ['On Hold','Ongoing','Disengaged','Complete'];
+    const outcomeParts = ['On Hold','Ongoing','Discharged','Complete'];
     let varianceCount = 0;
     const flaggedFiles = new Set();
     const rows = boxes.map(b => {
@@ -4102,7 +4104,7 @@ function exportProgramBoxExcel() {
         const row = { 'Program': b.program, 'Location': b.location || '—', 'Region': b.region || '—',
             'Awaiting Assessment Last Qtr': b.awaitingAssessmentLastQtr || 0, 'New Referrals': b.newReferrals || 0 };
         ['Awaiting Intake Assessment','Referral Withdrawn',
-         'On Hold','Ongoing','Disengaged','Complete'].forEach(s => row[s] = b.counts[s] || 0);
+         'On Hold','Ongoing','Discharged','Complete'].forEach(s => row[s] = b.counts[s] || 0);
         row['Other'] = b.other || 0;
         row['Total'] = b.total;
         return row;
@@ -4365,7 +4367,7 @@ function p_toggleConditionalFields() {
     document.getElementById('p_daysActiveGroup').style.display = clinical ? '' : 'none';
     document.getElementById('p_deliveryTypeGroup').style.display = clinical ? 'none' : '';
     const status = pVal('status');
-    const reportCompletedRelevant = status === 'Complete' || status === 'Disengaged';
+    const reportCompletedRelevant = status === 'Complete' || status === 'Discharged';
     document.getElementById('p_reportCompletedGroup').style.display = (!clinical && reportCompletedRelevant) ? '' : 'none';
     if (clinical) p_updateDaysActive();
 }
@@ -4728,7 +4730,7 @@ function p_saveEntry() {
         status: pVal('status'), location: pVal('location'),
         daysActive: isClinicalCounselling(program) ? document.getElementById('p_daysActive').value : '',
         deliveryType: pVal('deliveryType'),
-        reportCompleted: (pVal('status') === 'Complete' || pVal('status') === 'Disengaged') ? pVal('reportCompleted') : '',
+        reportCompleted: (pVal('status') === 'Complete' || pVal('status') === 'Discharged') ? pVal('reportCompleted') : '',
         referralDate: pVal('referralDate'), assessmentDate: pVal('assessmentDate'),
         startDate: pVal('startDate'), endDate: pVal('endDate'),
         notes: (practiceEditIndex !== -1 && practiceEntries[practiceEditIndex] && practiceEntries[practiceEditIndex].notes) ? practiceEntries[practiceEditIndex].notes : [],
@@ -4806,7 +4808,7 @@ function p_renderTable() {
     if (staleEntries.length === 0) { banner.classList.remove('visible'); p_staleOnlyFilter = false; }
     else {
         banner.classList.add('visible');
-        document.getElementById('p_staleBannerText').textContent = staleEntries.length + ' entr' + (staleEntries.length === 1 ? 'y has' : 'ies have') + ' been Complete/Disengaged for ' + STALE_DAYS_THRESHOLD + '+ days';
+        document.getElementById('p_staleBannerText').textContent = staleEntries.length + ' entr' + (staleEntries.length === 1 ? 'y has' : 'ies have') + ' been Complete/Discharged for ' + STALE_DAYS_THRESHOLD + '+ days';
         btn.textContent = p_staleOnlyFilter ? 'Show all entries' : 'Show only these';
     }
     if (filtered.length === 0) { body.innerHTML = ''; empty.style.display = ''; return; }
@@ -4882,10 +4884,10 @@ const p_tutorialSteps = [
     { section: 'participant', title: 'Participant Information', text: 'Start with the basics — participant name and date of birth on the first row, then gender, racial identity, and disability disclosure on the second row. Name and DOB are the most important for identifying participants.' },
     { section: 'referral', title: 'Referral Details', text: 'Record who referred the participant and which agency they came from. Then choose the program they\'re enrolled in. Some programs (like IPVIC) will reveal extra fields below.' },
     { section: 'timeline', title: 'Timeline & Dates', text: 'Track the journey from referral through assessment, start, and end. Dates lock in order — you can\'t set a Start Date without first entering a Referral and Assessment Date. The progress bar fills as you go.' },
-    { section: 'status', title: 'Status & Delivery', text: 'Set the current status (Awaiting Intake, Ongoing, Complete, etc.) and whether sessions are Individual or Group. If you mark someone Complete or Disengaged, a "Report Completed" field appears.' },
+    { section: 'status', title: 'Status & Delivery', text: 'Set the current status (Awaiting Intake, Ongoing, Complete, etc.) and whether sessions are Individual or Group. If you mark someone Complete or Discharged, a "Report Completed" field appears.' },
     { section: 'notes', title: 'Notes', text: 'Add optional notes to any entry — things like session observations, follow-up reminders, or important context. Notes are saved with a timestamp.' },
     { section: 'actions', title: 'Adding, Editing & Actions', text: 'Click "Add Entry" to save a new record, or "Clear" to reset the form. "Wipe All Data" clears all entries permanently. On the right side: "Submit" saves a local backup, "Email Report" sends data via email, and "Download" exports a file. To edit an existing entry, click the Edit button in the table below.' },
-    { section: 'table', title: 'Table, Search & Filters', text: 'Your entries appear in the table below. Use the search bar to find participants, or filter by Program, Location, or Status. Click "Customize Columns" to show/hide and reorder columns. Stale entries (Complete/Disengaged for 30+ days) are highlighted with a warning.' },
+    { section: 'table', title: 'Table, Search & Filters', text: 'Your entries appear in the table below. Use the search bar to find participants, or filter by Program, Location, or Status. Click "Customize Columns" to show/hide and reorder columns. Stale entries (Complete/Discharged for 30+ days) are highlighted with a warning.' },
     { section: 'archive', title: 'Archive Page', text: 'The Archive page lets you save monthly snapshots of your data. Click "Archive Current Month" to capture all entries as they stand right now. Past archives appear in a list below — each one is a frozen snapshot you can refer back to, even if entries change later.' },
     { section: 'help', title: 'Help Page', text: 'The Help page has three sections: a contact card to email support, the Entries button, and a Frequently Asked Questions accordion covering topics like how to submit reports, what JSON files are, and how to set up email recipients.' },
     { section: 'settings', title: 'Settings Page', text: 'Settings has four sections: About (version info, What\'s New, and update checker), Report Settings (switch between LRP and New Day report modes, set your staff name), Submission (add default email recipients for the Email Report feature), and Display (Dark Mode, Color Blind Mode, and a fun logo light toggle).' },
