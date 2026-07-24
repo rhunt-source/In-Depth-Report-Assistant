@@ -395,13 +395,44 @@
         .conn-err { background:#e53e3e; }
         .profile-field-label { font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px; }
         .profile-field-value { font-size:13px; color:var(--text); font-weight:500; }
-        .profile-timeline-step { text-align:center; min-width:120px; }
-        .profile-timeline-dot { width:12px; height:12px; border-radius:50%; margin:0 auto 6px; }
-        .profile-timeline-dot.filled { background:#1c7289; }
-        .profile-timeline-dot.empty { background:var(--border); }
-        .profile-timeline-date { font-size:11px; color:var(--text-muted); }
-        .profile-timeline-label { font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px; }
-        .profile-timeline-connector { flex:1; height:2px; background:var(--border); align-self:center; margin-top:-18px; }
+        .profile-timeline-container { display:flex; flex-direction:column; gap:0; }
+        .profile-timeline-card {
+            display:flex; align-items:center; gap:16px; padding:14px 18px;
+            background:var(--card-bg); border:1px solid var(--border); border-radius:12px;
+            position:relative; opacity:0; transform:translateX(-30px);
+            animation:timelineSlideIn 0.4s ease forwards;
+        }
+        .profile-timeline-card:nth-child(1) { animation-delay:0s; }
+        .profile-timeline-card:nth-child(2) { animation-delay:0.12s; }
+        .profile-timeline-card:nth-child(3) { animation-delay:0.24s; }
+        .profile-timeline-card:nth-child(4) { animation-delay:0.36s; }
+        @keyframes timelineSlideIn {
+            to { opacity:1; transform:translateX(0); }
+        }
+        .profile-timeline-card.filled { border-left:3px solid #1c7289; }
+        .profile-timeline-card.empty { border-left:3px solid var(--border); opacity:0; transform:translateX(-30px); animation:timelineSlideInEmpty 0.4s ease forwards; }
+        @keyframes timelineSlideInEmpty {
+            to { opacity:0.55; transform:translateX(0); }
+        }
+        .profile-timeline-icon {
+            width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+            flex-shrink:0; font-size:16px; transition:transform 0.2s;
+        }
+        .profile-timeline-card:hover .profile-timeline-icon { transform:scale(1.1); }
+        .profile-timeline-icon.filled { background:rgba(28,114,137,0.12); color:#1c7289; }
+        .profile-timeline-icon.empty { background:var(--bg-alt); color:var(--text-muted); }
+        .profile-timeline-info { flex:1; }
+        .profile-timeline-label { font-size:12px; font-weight:600; color:var(--text); text-transform:uppercase; letter-spacing:0.04em; }
+        .profile-timeline-date { font-size:13px; color:var(--text-muted); margin-top:2px; }
+        .profile-timeline-connector {
+            width:2px; height:16px; margin-left:35px;
+            background:linear-gradient(to bottom, var(--border), transparent);
+            opacity:0; animation:connectorFade 0.3s ease forwards;
+        }
+        .profile-timeline-connector:nth-child(2) { animation-delay:0.06s; }
+        .profile-timeline-connector:nth-child(4) { animation-delay:0.18s; }
+        .profile-timeline-connector:nth-child(6) { animation-delay:0.30s; }
+        @keyframes connectorFade { to { opacity:0.6; } }
         .profile-note-card { border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:8px; }
         .profile-note-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
         .profile-note-category { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; padding:2px 8px; border-radius:4px; display:inline-block; }
@@ -2176,20 +2207,23 @@ function renderProfile() {
     if (editBtn) editBtn.style.display = '';
 
     var steps = [
-        { label: 'Referral', date: e.referralDate },
-        { label: 'Assessment', date: e.assessmentDate },
-        { label: 'Start', date: e.startDate },
-        { label: 'End', date: e.endDate }
+        { label: 'Referral', date: e.referralDate, icon: '📩' },
+        { label: 'Assessment', date: e.assessmentDate, icon: '📋' },
+        { label: 'Start', date: e.startDate, icon: '🚀' },
+        { label: 'End', date: e.endDate, icon: '✅' }
     ];
-    var timeHTML = '';
+    var timeHTML = '<div class="profile-timeline-container">';
     steps.forEach(function(s, idx) {
         if (idx > 0) timeHTML += '<div class="profile-timeline-connector"></div>';
         var filled = !!s.date;
-        timeHTML += '<div class="profile-timeline-step">' +
+        timeHTML += '<div class="profile-timeline-card ' + (filled ? 'filled' : 'empty') + '">' +
+            '<div class="profile-timeline-icon ' + (filled ? 'filled' : 'empty') + '">' + (filled ? '✓' : s.icon) + '</div>' +
+            '<div class="profile-timeline-info">' +
             '<div class="profile-timeline-label">' + s.label + '</div>' +
-            '<div class="profile-timeline-dot ' + (filled ? 'filled' : 'empty') + '"></div>' +
-            '<div class="profile-timeline-date">' + (s.date || '—') + '</div></div>';
+            '<div class="profile-timeline-date">' + (s.date || 'Pending') + '</div>' +
+            '</div></div>';
     });
+    timeHTML += '</div>';
     document.getElementById('profileTimeline').innerHTML = timeHTML;
 
     var staffName = localStorage.getItem('staffName') || '';
@@ -2491,20 +2525,23 @@ function renderSearchProfile() {
     if (editBtn2) editBtn2.style.display = 'none';
 
     var steps = [
-        { label: 'Referral', date: e.referralDate },
-        { label: 'Assessment', date: e.assessmentDate },
-        { label: 'Start', date: e.startDate },
-        { label: 'End', date: e.endDate }
+        { label: 'Referral', date: e.referralDate, icon: '📩' },
+        { label: 'Assessment', date: e.assessmentDate, icon: '📋' },
+        { label: 'Start', date: e.startDate, icon: '🚀' },
+        { label: 'End', date: e.endDate, icon: '✅' }
     ];
-    var timeHTML = '';
+    var timeHTML = '<div class="profile-timeline-container">';
     steps.forEach(function(s, idx) {
         if (idx > 0) timeHTML += '<div class="profile-timeline-connector"></div>';
         var filled = !!s.date;
-        timeHTML += '<div class="profile-timeline-step">' +
+        timeHTML += '<div class="profile-timeline-card ' + (filled ? 'filled' : 'empty') + '">' +
+            '<div class="profile-timeline-icon ' + (filled ? 'filled' : 'empty') + '">' + (filled ? '✓' : s.icon) + '</div>' +
+            '<div class="profile-timeline-info">' +
             '<div class="profile-timeline-label">' + s.label + '</div>' +
-            '<div class="profile-timeline-dot ' + (filled ? 'filled' : 'empty') + '"></div>' +
-            '<div class="profile-timeline-date">' + (s.date || '—') + '</div></div>';
+            '<div class="profile-timeline-date">' + (s.date || 'Pending') + '</div>' +
+            '</div></div>';
     });
+    timeHTML += '</div>';
     document.getElementById('profileTimeline').innerHTML = timeHTML;
 
     var staffName = localStorage.getItem('staffName') || '';
