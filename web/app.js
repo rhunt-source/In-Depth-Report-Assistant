@@ -506,3 +506,23 @@ function pbSubscribeEntries(callback) {
         console.error('Real-time subscribe failed:', e);
     }
 }
+
+async function pbSearchEntries(query) {
+    if (!pb || !pb.authStore.isValid) return [];
+    if (!query || query.length < 2) return [];
+    try {
+        var q = query.toLowerCase();
+        var filterStr = pb.filter(
+            'participantName ~ {:q} || phone ~ {:q} || email ~ {:q} || program ~ {:q} || status ~ {:q} || staffName ~ {:q} || address ~ {:q} || emergencyName ~ {:q} || emergencyPhone ~ {:q} || referralSource ~ {:q} || referralAgency ~ {:q}',
+            { q: q }
+        );
+        var result = await pb.collection('entries').getFullList({
+            filter: filterStr,
+            sort: '-created',
+        });
+        return result.map(function(r) { r._pbId = r.id; return r; });
+    } catch (e) {
+        console.error('Global search failed:', e);
+        return [];
+    }
+}

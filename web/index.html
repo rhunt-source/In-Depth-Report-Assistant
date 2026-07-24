@@ -459,6 +459,10 @@
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12a2 2 0 002 2h8a2 2 0 002-2l1-12M10 12h4"/></svg>
                 Archive
             </button>
+            <button class="nav-btn" onclick="showPage('search', event)">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                Search
+            </button>
             <button class="nav-btn" onclick="showPage('admin', event)">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m0-15c-2.5-2-6-2-8.5 0v15c2.5-2 6-2 8.5 0m0-15c2.5-2 6-2 8.5 0v15c-2.5-2-6-2-8.5 0"/></svg>
                 Admin
@@ -532,6 +536,22 @@
                     <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Racial Identity</label><select id="race"><option value=""></option><option>White</option><option>Black</option><option>Indigenous</option><option>South Asian</option><option>East or Southeast Asian</option><option>Middle Eastern or North African</option><option>Latin American</option><option>Other</option><option>Prefer not to say</option></select></div>
                     <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Disability Disclosure</label><select id="disabilityDisclosure"><option value=""></option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
                 </div>
+                <div class="form-section-title">Contact</div>
+                <div style="display:flex;gap:14px;margin-bottom:8px;">
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Phone</label><input type="tel" id="phone" placeholder="Phone number"></div>
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Email</label><input type="email" id="email" placeholder="Email address"></div>
+                </div>
+                <div style="display:flex;gap:14px;margin-bottom:16px;">
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Address</label><input type="text" id="address" placeholder="Street address, city"></div>
+                </div>
+                <div class="form-section-title">Emergency Contact</div>
+                <div style="display:flex;gap:14px;margin-bottom:8px;">
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Emergency Contact Name</label><input type="text" id="emergencyName" placeholder="Full name"></div>
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Emergency Contact Phone</label><input type="tel" id="emergencyPhone" placeholder="Phone number"></div>
+                </div>
+                <div style="display:flex;gap:14px;margin-bottom:16px;">
+                    <div class="form-group" style="flex:1 1 0;min-width:0;"><label>Relationship</label><input type="text" id="emergencyRelationship" placeholder="e.g. Spouse, Parent, Sibling"></div>
+                </div>
                 <div class="form-section-title">Referral</div>
                 <div class="form-grid">
                     <div class="form-group"><label>Referral Source</label><input type="text" id="referralSource" placeholder="Enter referral source"></div>
@@ -584,7 +604,7 @@
                 </div>
             </div>
             <div class="filter-row">
-                <div class="form-group" style="flex:2 1 220px"><label>Search</label><input type="text" id="searchInput" placeholder="Search by participant..." oninput="renderTable()"></div>
+                <div class="form-group" style="flex:2 1 220px"><label>Search</label><input type="text" id="searchInput" placeholder="Search by name, phone, staff..." oninput="renderTable()"></div>
                 <div class="form-group lrp-only"><label>Filter Program</label><select id="programFilter" onchange="renderTable()"><option value="">All Programs</option><option>Anger Solutions</option><option>CBA</option><option>Clinical Counselling</option><option>Dads</option><option>DBT</option><option>IDA</option><option>Maintenance</option><option>PAR</option><option>Safety and Repair</option><option>Safety and Repair (IPVIC)</option><option>Seeking Safety</option><option>STABLE</option></select></div>
                 <div class="form-group"><label>Filter Location</label><select id="locationFilter" onchange="renderTable()"><option value="">All Locations</option><option>Community</option><option>HMP</option><option>Virtual</option><option>Other</option></select></div>
                 <div class="form-group"><label>Filter Status</label><select id="statusFilter" onchange="renderTable()"><option value="">All Statuses</option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Disengaged</option><option>Complete</option></select></div>
@@ -607,7 +627,7 @@
         <!-- PROFILE PAGE -->
         <div id="page-profile" class="page">
             <div class="page-header" style="display:flex;align-items:center;gap:12px;">
-                <button class="btn-secondary" onclick="showPage('entries', null)" style="padding:6px 12px;font-size:12px;">← Back</button>
+                <button class="btn-secondary" onclick="searchProfileRecord ? backToSearchResults() : showPage('entries', null)" style="padding:6px 12px;font-size:12px;">← Back</button>
                 <div><h1 id="profileName">Participant Profile</h1><p id="profileSubtitle">Details and notes</p></div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
@@ -618,6 +638,16 @@
                 <div class="card" style="padding:20px;">
                     <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;">Program & Status</h3>
                     <div id="profileProgram" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+                <div class="card" style="padding:20px;">
+                    <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;">Contact</h3>
+                    <div id="profileContact" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+                </div>
+                <div class="card" style="padding:20px;">
+                    <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;">Emergency Contact</h3>
+                    <div id="profileEmergency" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
                 </div>
             </div>
             <div class="card" style="padding:20px;margin-bottom:20px;">
@@ -649,6 +679,19 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- SEARCH PAGE -->
+        <div id="page-search" class="page">
+            <div class="page-header"><h1>Search All Entries</h1><p>Find any participant across all facilitators</p></div>
+            <div class="card" style="padding:16px;margin-bottom:16px;">
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <input type="text" id="globalSearchInput" placeholder="Search by name, phone, email, program, status, staff..." oninput="debounceGlobalSearch()" style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--input-bg);color:var(--text);">
+                    <button class="btn-primary" onclick="globalSearch()" style="background:#1c7289;padding:10px 18px;">🔍 Search</button>
+                </div>
+                <div id="globalSearchStatus" style="font-size:12px;color:var(--text-muted);margin-top:8px;"></div>
+            </div>
+            <div id="globalSearchResults"></div>
         </div>
 
         <!-- ARCHIVE PAGE -->
@@ -1961,6 +2004,8 @@ function saveEntry() {
     const entry = {
         staffName,
         participantName, dob: document.getElementById('dob').value, race: document.getElementById('race').value, disabilityDisclosure: document.getElementById('disabilityDisclosure').value, gender: document.getElementById('gender').value, referralSource: document.getElementById('referralSource').value,
+        phone: document.getElementById('phone').value, email: document.getElementById('email').value, address: document.getElementById('address').value,
+        emergencyName: document.getElementById('emergencyName').value, emergencyPhone: document.getElementById('emergencyPhone').value, emergencyRelationship: document.getElementById('emergencyRelationship').value,
         referralAgency: document.getElementById('referralAgency').value, program,
         region: (reportMode !== 'newday' && isIPVIC(program)) ? document.getElementById('region').value : '',
         riskLevel: (reportMode !== 'newday' && isIPVIC(program)) ? document.getElementById('riskLevel').value : 'N/A',
@@ -1992,6 +2037,12 @@ function editEntry(i) {
     document.getElementById('disabilityDisclosure').value = e.disabilityDisclosure || '';
     document.getElementById('gender').value = e.gender || '';
     document.getElementById('referralSource').value = e.referralSource || '';
+    document.getElementById('phone').value = e.phone || '';
+    document.getElementById('email').value = e.email || '';
+    document.getElementById('address').value = e.address || '';
+    document.getElementById('emergencyName').value = e.emergencyName || '';
+    document.getElementById('emergencyPhone').value = e.emergencyPhone || '';
+    document.getElementById('emergencyRelationship').value = e.emergencyRelationship || '';
     document.getElementById('referralAgency').value = e.referralAgency || '';
     document.getElementById('program').value = e.program || '';
     document.getElementById('region').value = e.region || '';
@@ -2101,6 +2152,7 @@ let profileEntryIndex = -1;
 
 function openProfile(i) {
     profileEntryIndex = i;
+    searchProfileRecord = null;
     renderProfile();
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-profile').classList.add('active');
@@ -2133,6 +2185,16 @@ function renderProfile() {
     progHTML += profileField('Agency', e.referralAgency);
     progHTML += profileField('Staff', e.staffName);
     document.getElementById('profileProgram').innerHTML = progHTML;
+
+    var contactHTML = profileField('Phone', e.phone);
+    contactHTML += profileField('Email', e.email);
+    contactHTML += profileField('Address', e.address);
+    document.getElementById('profileContact').innerHTML = contactHTML;
+
+    var emergHTML = profileField('Name', e.emergencyName);
+    emergHTML += profileField('Phone', e.emergencyPhone);
+    emergHTML += profileField('Relationship', e.emergencyRelationship);
+    document.getElementById('profileEmergency').innerHTML = emergHTML;
 
     var steps = [
         { label: 'Referral', date: e.referralDate },
@@ -2222,6 +2284,174 @@ function editEntryFromProfile() {
     editEntry(profileEntryIndex);
 }
 
+// ── Global search (all users) ───────────────────────────────────
+let searchResultEntries = [];
+let globalSearchTimer = null;
+
+function debounceGlobalSearch() {
+    clearTimeout(globalSearchTimer);
+    globalSearchTimer = setTimeout(globalSearch, 400);
+}
+
+async function globalSearch() {
+    var input = document.getElementById('globalSearchInput');
+    var query = (input ? input.value : '').trim();
+    var statusEl = document.getElementById('globalSearchStatus');
+    var resultsEl = document.getElementById('globalSearchResults');
+    if (!query || query.length < 2) {
+        if (statusEl) statusEl.textContent = '';
+        if (resultsEl) resultsEl.innerHTML = '';
+        searchResultEntries = [];
+        return;
+    }
+    if (statusEl) statusEl.textContent = 'Searching...';
+    var results = await pbSearchEntries(query);
+    searchResultEntries = results;
+    if (statusEl) statusEl.textContent = results.length + ' result' + (results.length !== 1 ? 's' : '') + ' found';
+    if (!resultsEl) return;
+    if (results.length === 0) {
+        resultsEl.innerHTML = '<div class="card" style="padding:40px;text-align:center;color:var(--text-muted);">No participants found matching "' + escapeHtml(query) + '"</div>';
+        return;
+    }
+    resultsEl.innerHTML = '<div class="card" style="padding:0;overflow:hidden;">' +
+        '<table><thead><tr>' +
+        '<th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--text-muted);border-bottom:1px solid var(--border);">Participant</th>' +
+        '<th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--text-muted);border-bottom:1px solid var(--border);">Staff</th>' +
+        '<th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--text-muted);border-bottom:1px solid var(--border);">Program</th>' +
+        '<th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--text-muted);border-bottom:1px solid var(--border);">Status</th>' +
+        '<th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--text-muted);border-bottom:1px solid var(--border);">Phone</th>' +
+        '<th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--text-muted);border-bottom:1px solid var(--border);">Email</th>' +
+        '</tr></thead><tbody>' +
+        results.map(function(e, i) {
+            var badgeClass = statusBadgeClass(e.status);
+            return '<tr style="cursor:pointer;border-bottom:1px solid var(--border);" onclick="openSearchResult(' + i + ')" onmouseover="this.style.background=var(--bg-alt)" onmouseout="this.style.background=\'\'">' +
+                '<td style="padding:10px 16px;font-size:13px;font-weight:600;color:var(--accent);">' + escapeHtml(e.participantName || '—') + '</td>' +
+                '<td style="padding:10px 16px;font-size:13px;color:var(--text);">' + escapeHtml(e.staffName || '—') + '</td>' +
+                '<td style="padding:10px 16px;font-size:13px;color:var(--text);">' + escapeHtml(e.program || '—') + '</td>' +
+                '<td style="padding:10px 16px;font-size:13px;"><span class="badge ' + badgeClass + '">' + escapeHtml(e.status || '—') + '</span></td>' +
+                '<td style="padding:10px 16px;font-size:13px;color:var(--text);">' + escapeHtml(e.phone || '—') + '</td>' +
+                '<td style="padding:10px 16px;font-size:13px;color:var(--text);">' + escapeHtml(e.email || '—') + '</td>' +
+                '</tr>';
+        }).join('') +
+        '</tbody></table></div>';
+}
+
+function openSearchResult(i) {
+    if (i < 0 || i >= searchResultEntries.length) return;
+    var record = searchResultEntries[i];
+    var localIdx = entries.findIndex(function(e) { return e._pbId === record._pbId; });
+    if (localIdx !== -1) {
+        openProfile(localIdx);
+    } else {
+        openSearchProfile(record);
+    }
+}
+
+let searchProfileRecord = null;
+
+function openSearchProfile(record) {
+    searchProfileRecord = record;
+    renderSearchProfile();
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-profile').classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    var searchBtn = document.querySelector('[onclick*="showPage(\'search\'"]');
+    if (searchBtn) searchBtn.classList.add('active');
+}
+
+function renderSearchProfile() {
+    var e = searchProfileRecord;
+    if (!e) return;
+    document.getElementById('profileName').textContent = e.participantName || 'Unknown Participant';
+    document.getElementById('profileSubtitle').textContent = (e.program || '') + (e.status ? ' — ' + e.status : '') + ' (from: ' + (e.staffName || 'unknown') + ')';
+
+    var infoHTML = profileField('Name', e.participantName);
+    infoHTML += profileField('Date of Birth', e.dob);
+    infoHTML += profileField('Gender', e.gender);
+    infoHTML += profileField('Racial Identity', e.race);
+    infoHTML += profileField('Disability', e.disabilityDisclosure);
+    infoHTML += profileField('Location', e.location);
+    document.getElementById('profileInfo').innerHTML = infoHTML;
+
+    var progHTML = profileField('Program', e.program);
+    progHTML += profileField('Status', '<span class="badge ' + statusBadgeClass(e.status) + '">' + (e.status || '—') + '</span>');
+    progHTML += profileField('Delivery', e.deliveryType);
+    progHTML += profileField('Region', e.region);
+    progHTML += profileField('Risk Level', e.riskLevel);
+    progHTML += profileField('Days Active', e.daysActive);
+    progHTML += profileField('Referral Source', e.referralSource);
+    progHTML += profileField('Agency', e.referralAgency);
+    progHTML += profileField('Staff', e.staffName);
+    document.getElementById('profileProgram').innerHTML = progHTML;
+
+    var contactHTML = profileField('Phone', e.phone);
+    contactHTML += profileField('Email', e.email);
+    contactHTML += profileField('Address', e.address);
+    document.getElementById('profileContact').innerHTML = contactHTML;
+
+    var emergHTML = profileField('Name', e.emergencyName);
+    emergHTML += profileField('Phone', e.emergencyPhone);
+    emergHTML += profileField('Relationship', e.emergencyRelationship);
+    document.getElementById('profileEmergency').innerHTML = emergHTML;
+
+    var steps = [
+        { label: 'Referral', date: e.referralDate },
+        { label: 'Assessment', date: e.assessmentDate },
+        { label: 'Start', date: e.startDate },
+        { label: 'End', date: e.endDate }
+    ];
+    var timeHTML = '';
+    steps.forEach(function(s, idx) {
+        if (idx > 0) timeHTML += '<div class="profile-timeline-connector"></div>';
+        var filled = !!s.date;
+        timeHTML += '<div class="profile-timeline-step">' +
+            '<div class="profile-timeline-label">' + s.label + '</div>' +
+            '<div class="profile-timeline-dot ' + (filled ? 'filled' : 'empty') + '"></div>' +
+            '<div class="profile-timeline-date">' + (s.date || '—') + '</div></div>';
+    });
+    document.getElementById('profileTimeline').innerHTML = timeHTML;
+
+    var staffName = localStorage.getItem('staffName') || '';
+    document.getElementById('profileNoteStaff').textContent = staffName ? 'Posting as: ' + staffName : '';
+
+    renderSearchProfileNotes();
+}
+
+function renderSearchProfileNotes() {
+    var e = searchProfileRecord;
+    if (!e) return;
+    var notes = e.notes || [];
+    document.getElementById('profileNoteCount').textContent = '(' + notes.length + ')';
+    var listEl = document.getElementById('profileNotesList');
+    if (notes.length === 0) {
+        listEl.innerHTML = '<p style="font-size:12px;color:var(--text-faint);text-align:center;padding:20px 0;">No notes on this entry.</p>';
+        return;
+    }
+    listEl.innerHTML = notes.slice().reverse().map(function(n) {
+        var catClass = 'cat-other';
+        var cat = (n.category || 'Other').toLowerCase().replace(/\s+/g, '');
+        if (cat === 'sessionnote') catClass = 'cat-session';
+        else if (cat === 'phonecall') catClass = 'cat-phone';
+        else if (cat === 'email') catClass = 'cat-email';
+        else if (cat === 'incident') catClass = 'cat-incident';
+        else if (cat === 'progressupdate') catClass = 'cat-progress';
+        else if (cat === 'referral') catClass = 'cat-referral';
+        return '<div class="profile-note-card">' +
+            '<div class="profile-note-header">' +
+            '<div><span class="profile-note-category ' + catClass + '">' + escapeHtml(n.category || 'Note') + '</span> ' +
+            '<span style="font-size:11px;color:var(--text-faint);margin-left:8px;">' + escapeHtml(n.date || '') + '</span>' +
+            (n.staff ? '<span style="font-size:11px;color:var(--text-faint);margin-left:8px;">by ' + escapeHtml(n.staff) + '</span>' : '') +
+            '</div></div>' +
+            '<div style="font-size:13px;color:var(--text);white-space:pre-wrap;margin-top:4px;">' + escapeHtml(n.text || '') + '</div>' +
+            '</div>';
+    }).join('');
+}
+
+function backToSearchResults() {
+    searchProfileRecord = null;
+    showPage('search', null);
+}
+
 // ── Entries table: customizable columns ───────────────────────
 const COLUMN_DEFS = [
     { id: 'participant',  label: 'Participant',           cssClass: '',                  getValue: (e, i) => `<a class="participant-link" onclick="openProfile(${i})" style="cursor:pointer"><b>${e.participantName||'—'}</b></a>` },
@@ -2284,7 +2514,7 @@ function renderTable() {
     const locFilter = document.getElementById('locationFilter')?.value || '';
     const statFilter = document.getElementById('statusFilter')?.value || '';
     const filtered = entries.filter(e => {
-        const matchQ = !q || (e.participantName || '').toLowerCase().includes(q);
+        const matchQ = !q || (e.participantName || '').toLowerCase().includes(q) || (e.phone || '').toLowerCase().includes(q) || (e.email || '').toLowerCase().includes(q) || (e.staffName || '').toLowerCase().includes(q) || (e.address || '').toLowerCase().includes(q);
         return matchQ && (!progFilter || e.program === progFilter) && (!locFilter || e.location === locFilter) && (!statFilter || e.status === statFilter) && (!staleOnlyFilter || isStaleEntry(e));
     });
     const body = document.getElementById('tableBody');
