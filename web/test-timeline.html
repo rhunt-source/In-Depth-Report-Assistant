@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Timeline Preview</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#0f1b2d; font-family:'Segoe UI',sans-serif; padding:40px; display:flex; flex-direction:column; gap:40px; align-items:center; }
+
+    .timeline-wrap { width:100%; max-width:700px; padding:24px 0; }
+
+    .timeline {
+        display:flex; align-items:center; position:relative;
+    }
+
+    /* ── Connector line (always full width) ─────────────────── */
+    .timeline-track {
+        position:absolute; top:11px; left:11px; right:11px; height:3px;
+        background:#1e2d40; border-radius:2px; overflow:hidden;
+    }
+    .timeline-track-fill {
+        height:100%; width:0%; background:linear-gradient(90deg,#1c7289,#32B9A3);
+        border-radius:2px; transition:width 0.5s ease;
+    }
+
+    /* ── Step ──────────────────────────────────────────────── */
+    .timeline-step {
+        flex:1; display:flex; flex-direction:column; align-items:center;
+        position:relative; z-index:2;
+    }
+
+    .timeline-dot {
+        width:24px; height:24px; border-radius:50%;
+        display:flex; align-items:center; justify-content:center;
+        font-size:12px; font-weight:700;
+        background:#0f1b2d; border:3px solid #2a3a4e; color:#4a5a6e;
+        transition:border-color 0.4s, background 0.4s, color 0.4s, box-shadow 0.4s, transform 0.3s;
+    }
+    .timeline-dot.filled {
+        background:#1c7289; border-color:#32B9A3; color:#fff;
+    }
+
+    /* ── Staggered pop-in on load ──────────────────────────── */
+    .timeline-dot {
+        animation:dotAppear 0.35s ease backwards;
+    }
+    .timeline-step:nth-child(1) .timeline-dot { animation-delay:0.05s; }
+    .timeline-step:nth-child(2) .timeline-dot { animation-delay:0.15s; }
+    .timeline-step:nth-child(3) .timeline-dot { animation-delay:0.25s; }
+    .timeline-step:nth-child(4) .timeline-dot { animation-delay:0.35s; }
+    @keyframes dotAppear {
+        0% { transform:scale(0); opacity:0; }
+        70% { transform:scale(1.15); }
+        100% { transform:scale(1); opacity:1; }
+    }
+
+    /* ── Pulse on last filled ──────────────────────────────── */
+    .timeline-dot.last-filled {
+        animation:lastPulse 2s ease-in-out infinite;
+    }
+    @keyframes lastPulse {
+        0%,100% { box-shadow:0 0 0 0 rgba(50,185,163,0.4); }
+        50% { box-shadow:0 0 0 8px rgba(50,185,163,0); }
+    }
+
+    .timeline-dot:hover { transform:scale(1.12); }
+
+    .timeline-info { text-align:center; margin-top:12px; }
+    .timeline-label {
+        font-size:11px; font-weight:600; text-transform:uppercase;
+        letter-spacing:0.06em; color:#5a6a7e;
+        transition:color 0.4s;
+    }
+    .timeline-dot.filled ~ .timeline-info .timeline-label { color:#c0d0e0; }
+    .timeline-date {
+        font-size:12px; color:#3e5060; margin-top:3px;
+        transition:color 0.4s;
+    }
+    .timeline-dot.filled ~ .timeline-info .timeline-date { color:#7a9ab0; }
+    .timeline-status { font-size:10px; margin-top:3px; font-weight:500; }
+
+    /* ── Preview Controls ──────────────────────────────────── */
+    .controls { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+    .controls button {
+        padding:8px 16px; border:1px solid #2a3a4e; border-radius:8px;
+        background:#1a2a3d; color:#e0e8f0; cursor:pointer; font-size:13px;
+        transition:background 0.2s;
+    }
+    .controls button:hover { background:#2a3a4e; }
+    .controls button.active { background:#1c7289; border-color:#1c7289; }
+    .label { color:#6a7a8e; font-size:12px; text-align:center; }
+</style>
+</head>
+<body>
+    <div class="label">Timeline Preview — Click buttons to toggle steps</div>
+
+    <div class="timeline-wrap">
+        <div class="timeline" id="timeline">
+            <div class="timeline-track"><div class="timeline-track-fill" id="trackFill"></div></div>
+        </div>
+    </div>
+
+    <div class="controls" id="controls"></div>
+    <div class="label" id="statusLabel"></div>
+
+<script>
+var steps = [
+    { label:'Referral',   date:'2026-01-15', filled:true },
+    { label:'Assessment', date:'2026-02-03', filled:true },
+    { label:'Start',      date:'',           filled:false },
+    { label:'End',        date:'',           filled:false },
+];
+
+function render() {
+    var tl = document.getElementById('timeline');
+    // keep track element
+    var track = document.getElementById('trackFill').parentElement;
+    tl.innerHTML = '';
+    tl.appendChild(track);
+
+    // find last filled index
+    var lastFilled = -1;
+    steps.forEach(function(s, i) { if (s.filled) lastFilled = i; });
+
+    steps.forEach(function(s, i) {
+        var step = document.createElement('div');
+        step.className = 'timeline-step';
+        var isLast = (i === lastFilled);
+        step.innerHTML =
+            '<div class="timeline-dot' + (s.filled ? ' filled' : '') + (isLast ? ' last-filled' : '') + '">' +
+            (s.filled ? '✓' : (i+1)) +
+            '</div>' +
+            '<div class="timeline-info">' +
+            '<div class="timeline-label">' + s.label + '</div>' +
+            '<div class="timeline-date">' + (s.date || 'Pending') + '</div>' +
+            '<div class="timeline-status" style="color:' + (s.filled ? '#32B9A3' : '#3e5060') + '">' +
+            (s.filled ? 'Completed' : 'Pending') + '</div>' +
+            '</div>';
+        tl.appendChild(step);
+    });
+
+    // track fill percentage
+    var filledCount = steps.filter(function(s) { return s.filled; }).length;
+    var pct = steps.length <= 1 ? 0 : ((filledCount - 1) / (steps.length - 1)) * 100;
+    if (filledCount === 0) pct = 0;
+    document.getElementById('trackFill').style.width = pct + '%';
+
+    // controls
+    var ctrl = document.getElementById('controls');
+    ctrl.innerHTML = '';
+    steps.forEach(function(s, i) {
+        var btn = document.createElement('button');
+        btn.textContent = (s.filled ? '✓ ' : '○ ') + s.label;
+        btn.className = s.filled ? 'active' : '';
+        btn.onclick = function() { steps[i].filled = !steps[i].filled; render(); };
+        ctrl.appendChild(btn);
+    });
+
+    document.getElementById('statusLabel').textContent = filledCount + '/' + steps.length + ' steps completed';
+}
+
+render();
+</script>
+</body>
+</html>
