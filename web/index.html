@@ -1363,6 +1363,7 @@
                 <div class="form-group"><label>Filter Program</label><select id="p_programFilter" onchange="p_renderTable()"><option value="">All Programs</option><option>Anger Solutions</option><option>CBA</option><option>Clinical Counselling</option><option>Dads</option><option>DBT</option><option>IDA</option><option>Maintenance</option><option>PAR</option><option>Safety and Repair</option><option>Safety and Repair (IPVIC)</option><option>Seeking Safety</option><option>STABLE</option></select></div>
                 <div class="form-group"><label>Filter Location</label><select id="p_locationFilter" onchange="p_renderTable()"><option value="">All Locations</option><option>Community</option><option>HMP</option><option>Virtual</option><option>Other</option></select></div>
                 <div class="form-group"><label>Filter Status</label><select id="p_statusFilter" onchange="p_renderTable()"><option value="">All Statuses</option><option>Awaiting Intake Assessment</option><option>Intake Completed - Awaiting Program Start</option><option>Intake Completed - Not Accepted</option><option>Awaiting Program Start</option><option>Referral Withdrawn</option><option>On Hold</option><option>Ongoing</option><option>Discharged</option><option>Complete</option></select></div>
+                <div class="form-group lrp-only"><label>Filter Delivery</label><select id="p_deliveryFilter" onchange="p_renderTable()"><option value="">All Delivery</option><option>Individual</option><option>Group</option></select></div>
             </div>
             <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
                 <button class="btn-secondary" onclick="p_toggleColumnPanel()">⚙️ Customize Columns</button>
@@ -4348,6 +4349,33 @@ let practiceEditIndex = -1;
 let p_staleOnlyFilter = false;
 let p_tableColumns = [...DEFAULT_COLUMNS];
 
+const p_COLUMN_DEFS = [
+    { id: 'participant',  label: 'Participant',           cssClass: '',                  getValue: (e, i) => `<b>${e.participantName||'—'}</b>` },
+    { id: 'dob',         label: 'Date of Birth',         cssClass: 'col-dob',           getValue: (e) => e.dob || '—' },
+    { id: 'race',        label: 'Racial Identity',       cssClass: 'col-race',          getValue: (e) => e.race || '—' },
+    { id: 'risk',        label: 'Risk',                  cssClass: 'col-risk',          getValue: (e) => e.riskLevel || '—' },
+    { id: 'disability',  label: 'Disability Disclosure', cssClass: 'col-disability',     getValue: (e) => e.disabilityDisclosure || '—' },
+    { id: 'gender',      label: 'Gender',                cssClass: '',                  getValue: (e) => e.gender || '—' },
+    { id: 'status',      label: 'Status',                cssClass: '',                  getValue: (e, i, stale) => `<span class="badge ${statusBadgeClass(e.status)}">${e.status||'—'}</span>${stale?`<span class="stale-flag" title="Ended ${e.endDate} (${staleDaysFor(e)} days ago)">⚠️</span>`:''}` },
+    { id: 'delivery',    label: 'Delivery',              cssClass: 'lrp-only',          getValue: (e) => e.deliveryType || '—' },
+    { id: 'program',     label: 'Program',               cssClass: 'lrp-only',          getValue: (e) => e.program || '—' },
+    { id: 'location',    label: 'Location',              cssClass: '',                  getValue: (e) => e.location || '—' },
+    { id: 'region',      label: 'Region',                cssClass: 'lrp-only col-region',getValue: (e) => e.region || '—' },
+    { id: 'daysactive',  label: 'Days Active',           cssClass: 'lrp-only col-daysactive', getValue: (e) => e.daysActive || '—' },
+    { id: 'source',      label: 'Source',                cssClass: 'col-source-agency', getValue: (e) => e.referralSource || '—' },
+    { id: 'agency',      label: 'Agency',                cssClass: 'col-source-agency', getValue: (e) => e.referralAgency || '—' },
+    { id: 'refdate',     label: 'Referral Date',         cssClass: 'col-timeline',      getValue: (e) => e.referralDate || '—' },
+    { id: 'assessdate',  label: 'Assessment Date',       cssClass: 'col-timeline',      getValue: (e) => e.assessmentDate || '—' },
+    { id: 'startdate',   label: 'Start Date',            cssClass: 'col-timeline',      getValue: (e) => e.startDate || '—' },
+    { id: 'enddate',     label: 'End Date',              cssClass: 'col-timeline',      getValue: (e) => e.endDate || '—' },
+    { id: 'notes',       label: 'Notes',                 cssClass: '',                  getValue: (e, i) => `<button class="btn-secondary" style="padding:5px 10px;font-size:12px" onclick="p_editEntry(${i})">📝 Notes${(e.notes&&e.notes.length)?` (${e.notes.length})`:''}</button>` },
+    { id: 'actions',     label: 'Actions',               cssClass: '',                  getValue: (e, i) => `<button class="btn-secondary" style="padding:5px 10px;font-size:12px" onclick="p_editEntry(${i})">Edit</button><button class="btn-danger" style="padding:5px 10px;font-size:12px;margin-left:4px" onclick="p_deleteEntry(${i})">Delete</button>` },
+];
+
+function p_getColDef(id) {
+    return p_COLUMN_DEFS.find(c => c.id === id) || getColDef(id);
+}
+
 function pVal(id) { const el = document.getElementById('p_' + id); return el ? el.value : ''; }
 function pSet(id, v) { const el = document.getElementById('p_' + id); if (el) el.value = v || ''; }
 
@@ -4355,7 +4383,7 @@ function p_loadTableColumns() {
     const saved = localStorage.getItem('practiceColumns_v' + APP_VERSION);
     if (saved) { try { p_tableColumns = JSON.parse(saved); } catch { p_tableColumns = [...DEFAULT_COLUMNS]; } }
     else { p_tableColumns = [...DEFAULT_COLUMNS]; }
-    p_tableColumns = p_tableColumns.filter(id => COLUMN_DEFS.some(c => c.id === id) && !LOCKED_COLUMNS.includes(id));
+    p_tableColumns = p_tableColumns.filter(id => p_COLUMN_DEFS.some(c => c.id === id) && !LOCKED_COLUMNS.includes(id));
     LOCKED_COLUMNS.forEach(id => { if (!p_tableColumns.includes(id)) p_tableColumns.push(id); });
 }
 function p_saveTableColumns() { localStorage.setItem('practiceColumns_v' + APP_VERSION, JSON.stringify(p_tableColumns)); }
@@ -4791,16 +4819,17 @@ function p_renderTable() {
     const empty = document.getElementById('p_emptyState');
     if (!head || !body) return;
     head.innerHTML = p_tableColumns.map(id => {
-        const col = getColDef(id);
+        const col = p_getColDef(id);
         return `<th class="${col.cssClass}">${col.label}</th>`;
     }).join('');
     const q = (document.getElementById('p_searchInput')?.value || '').toLowerCase();
     const progFilter = document.getElementById('p_programFilter')?.value || '';
     const locFilter = document.getElementById('p_locationFilter')?.value || '';
     const statFilter = document.getElementById('p_statusFilter')?.value || '';
+    const delFilter = document.getElementById('p_deliveryFilter')?.value || '';
     const filtered = practiceEntries.filter(e => {
         const matchQ = !q || (e.participantName || '').toLowerCase().includes(q);
-        return matchQ && (!progFilter || e.program === progFilter) && (!locFilter || e.location === locFilter) && (!statFilter || e.status === statFilter) && (!p_staleOnlyFilter || isStaleEntry(e));
+        return matchQ && (!progFilter || e.program === progFilter) && (!locFilter || e.location === locFilter) && (!statFilter || e.status === statFilter) && (!delFilter || e.deliveryType === delFilter) && (!p_staleOnlyFilter || isStaleEntry(e));
     });
     const staleEntries = practiceEntries.filter(isStaleEntry);
     const banner = document.getElementById('p_staleBanner');
@@ -4817,7 +4846,7 @@ function p_renderTable() {
         const i = practiceEntries.indexOf(e);
         const stale = isStaleEntry(e);
         const cells = p_tableColumns.map(id => {
-            const col = getColDef(id);
+            const col = p_getColDef(id);
             return `<td class="${col.cssClass}">${col.getValue(e, i, stale)}</td>`;
         }).join('');
         return `<tr class="${stale ? 'stale-row' : ''}">${cells}</tr>`;
@@ -4833,13 +4862,13 @@ function p_toggleColumnPanel() {
 
 function p_renderColumnList() {
     const list = document.getElementById('p_columnList');
-    const nonLocked = COLUMN_DEFS.filter(c => !LOCKED_COLUMNS.includes(c.id));
+    const nonLocked = p_COLUMN_DEFS.filter(c => !LOCKED_COLUMNS.includes(c.id));
     const nonLockedIds = nonLocked.map(c => c.id);
     const visible = p_tableColumns.filter(id => nonLockedIds.includes(id));
     const hidden = nonLockedIds.filter(id => !p_tableColumns.includes(id));
     const allOrdered = [...visible, ...hidden];
     list.innerHTML = allOrdered.map(id => {
-        const col = getColDef(id);
+        const col = p_getColDef(id);
         const isVisible = p_tableColumns.includes(id);
         return `<div class="col-drag-item" draggable="${isVisible}" data-col-id="${id}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--row-stripe);border-radius:8px;font-size:13px;${isVisible?'':'opacity:0.5;'}${isVisible?'cursor:grab;':'cursor:default;'}">
             <input type="checkbox" ${isVisible?'checked':''} onchange="p_toggleColumnVisibility('${id}', this.checked)" style="cursor:pointer;">
